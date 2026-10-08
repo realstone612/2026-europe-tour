@@ -748,32 +748,103 @@
         };
 
         // TTS Audio Pronunciation Function
-        function speakPhrase(text, lang, btnElement) {
-            if (!('speechSynthesis' in window)) {
-                showToast('❌ 이 브라우저는 음성 합성을 지원하지 않습니다.');
-                return;
-            }
+        // TTS Audio Pronunciation Function
+function speakPhrase(text, lang, btnElement) {
+    if (!('speechSynthesis' in window)) {
+        showToast('❌ 이 브라우저는 음성 합성을 지원하지 않습니다.');
+        return;
+    }
 
-            window.speechSynthesis.cancel(); // Stop prior speech
+    const synth = window.speechSynthesis;
+    synth.cancel();
 
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang;
-            utterance.rate = 0.85; // slightly slower for language learners
-            utterance.pitch = 1.0;
+    const speak = () => {
+        const utterance = new SpeechSynthesisUtterance(text);
 
-            // Visual feedback
-            if (btnElement) {
-                const icon = btnElement.querySelector('i');
-                if (icon) {
-                    icon.className = 'fa-solid fa-volume-high text-amber-500 speaking-badge';
-                    setTimeout(() => {
-                        icon.className = icon.className.replace('text-amber-500 speaking-badge', '');
-                    }, 1800);
-                }
-            }
+        // 원하는 현지 언어
+        utterance.lang = lang;
 
-            window.speechSynthesis.speak(utterance);
+        // 휴대폰에 설치된 해당 언어 음성을 직접 선택
+        const voices = synth.getVoices();
+
+        const targetLang = lang.toLowerCase();
+
+        let voice = voices.find(v =>
+            v.lang && v.lang.toLowerCase() === targetLang
+        );
+
+        // 지역 코드가 정확히 일치하지 않는 경우
+        if (!voice) {
+            const baseLang = targetLang.split('-')[0];
+
+            voice = voices.find(v =>
+                v.lang &&
+                v.lang.toLowerCase().startsWith(baseLang)
+            );
         }
+
+        // 그래도 없으면 해당 언어 계열의 음성을 우선 선택
+        if (!voice) {
+            const baseLang = targetLang.split('-')[0];
+
+            voice = voices.find(v =>
+                v.lang &&
+                v.lang.toLowerCase().includes(baseLang)
+            );
+        }
+
+        if (voice) {
+            utterance.voice = voice;
+            utterance.lang = voice.lang;
+        }
+
+        // 여행용 발음이므로 약간 천천히
+        utterance.rate = 0.82;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        // 버튼 시각 효과
+        if (btnElement) {
+            const icon = btnElement.querySelector('i');
+
+            if (icon) {
+                const originalClass = icon.className;
+
+                icon.className =
+                    'fa-solid fa-volume-high text-amber-500 speaking-badge';
+
+                utterance.onend = () => {
+                    icon.className = originalClass;
+                };
+
+                utterance.onerror = () => {
+                    icon.className = originalClass;
+                };
+            }
+        }
+
+        synth.speak(utterance);
+    };
+
+    // Android Chrome에서는 음성 목록이 늦게 로드될 수 있음
+    const voices = synth.getVoices();
+
+    if (voices.length > 0) {
+        speak();
+    } else {
+        synth.onvoiceschanged = () => {
+            synth.onvoiceschanged = null;
+            speak();
+        };
+
+        // 일부 Android 환경의 fallback
+        setTimeout(() => {
+            if (!synth.speaking) {
+                speak();
+            }
+        }, 300);
+    }
+}
 
         // Custom Toast Notification System (replaces alert)
         function showToast(message) {
