@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 가을 유럽여행</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Inter & Noto Sans KR) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        italy: '#15803d',
+                        spain: '#c2410c',
+                        france: '#1d4ed8'
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .tab-active {
+            border-bottom: 3px solid #2563eb;
+            color: #2563eb;
+            font-weight: 700;
+        }
+        .audio-btn {
+            transition: all 0.2s ease;
+        }
+        .audio-btn:active {
+            transform: scale(0.96);
+        }
+        .speaking-badge {
+            animation: pulse 1s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col pb-20 md:pb-6">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl sm:text-3xl">🇪🇺</span>
+                    <div>
+                        <h1 class="text-lg sm:text-2xl font-bold tracking-tight">2026 가을 유럽여행</h1>
+                        <p class="text-xs text-blue-200">10/18(일) ~ 10/31(토) · 로마 | 피렌체 | 베네치아 | 바르셀로나 | 파리</p>
+                    </div>
+                </div>
+                <div id="liveClock" class="text-right sm:hidden bg-slate-800/60 px-2 py-1 rounded text-xs">
+                    <div class="text-xs text-slate-300 font-mono" id="mobileClock">--:--</div>
+                </div>
+            </div>
+
+            <div class="hidden sm:flex items-center space-x-4 text-xs bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                <div class="text-center">
+                    <div class="text-slate-300">이탈리아/스페인/프랑스</div>
+                    <div class="font-bold text-amber-300" id="europeClock">CET --:--</div>
+                </div>
+                <div class="h-6 w-px bg-white/20"></div>
+                <div class="text-center">
+                    <div class="text-slate-300">대한민국 (KST)</div>
+                    <div class="font-bold text-emerald-300" id="koreaClock">KST --:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="bg-white border-b border-slate-200 text-slate-600 font-medium text-sm sm:text-base overflow-x-auto">
+            <div class="max-w-5xl mx-auto flex justify-around whitespace-nowrap min-w-max px-2">
+                <button onclick="switchTab('info')" id="tab-info" class="tab-button tab-active py-3 px-4 flex items-center space-x-2 transition">
+                    <i class="fa-solid font-bold fa-globe text-blue-600"></i>
+                    <span>국가&도시 정보</span>
+                </button>
+                <button onclick="switchTab('itinerary')" id="tab-itinerary" class="tab-button py-3 px-4 flex items-center space-x-2 transition">
+                    <i class="fa-solid font-bold fa-calendar-days text-indigo-600"></i>
+                    <span>여행계획</span>
+                </button>
+                <button onclick="switchTab('checklist')" id="tab-checklist" class="tab-button py-3 px-4 flex items-center space-x-2 transition">
+                    <i class="fa-solid font-bold fa-list-check text-emerald-600"></i>
+                    <span>준비물&체크리스트</span>
+                </button>
+                <button onclick="switchTab('budget')" id="tab-budget" class="tab-button py-3 px-4 flex items-center space-x-2 transition">
+                    <i class="fa-solid font-bold fa-wallet text-amber-600"></i>
+                    <span>예산관리</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Custom Notification Toast Container -->
+    <div id="toastContainer" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto w-full px-3 sm:px-4 py-4 flex-grow">
+
+        <!-- PAGE 1: 국가 & 도시 정보 (Interactive Speech Enabled) -->
+        <section id="page-info" class="page-content space-y-6">
+            
+            <!-- Notice Alert -->
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm">
+                <div class="flex items-start">
+                    <i class="fa-solid fa-clock-rotate-left text-amber-600 text-xl mt-0.5 mr-3"></i>
+                    <div>
+                        <h4 class="font-bold text-amber-900">⚠️ 서머타임(Daylight Saving Time) 해제 안내 및 현지어 발음 가이드</h4>
+                        <p class="text-xs sm:text-sm text-amber-800 mt-1">
+                            • <strong>시차 안내:</strong> 10월 25일(일) 새벽 서머타임 해제 (10/18~24: 7시간 차이 / 10/25~31: 8시간 차이)<br>
+                            • <strong>현지어 학습 기능:</strong> 아래 각 국가 카드에서 회화 표현의 <strong>[🔊 스피커 아이콘]</strong>을 누르면 원어민 발음(TTS)을 바로 들으실 수 있습니다!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Country Switcher Buttons -->
+            <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
+                <button onclick="filterCountryInfo('all')" class="country-btn bg-slate-800 text-white px-4 py-2 rounded-full text-sm font-semibold shadow hover:bg-slate-700 transition">전체보기</button>
+                <button onclick="filterCountryInfo('italy')" class="country-btn bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-full text-sm font-semibold shadow-sm hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-400 transition flex items-center gap-1.5"><span>🇮🇹</span> 이탈리아 (로마·피렌체·베네치아)</button>
+                <button onclick="filterCountryInfo('spain')" class="country-btn bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-full text-sm font-semibold shadow-sm hover:bg-orange-50 hover:text-orange-700 hover:border-orange-400 transition flex items-center gap-1.5"><span>🇪🇸</span> 스페인 (바르셀로나)</button>
+                <button onclick="filterCountryInfo('france')" class="country-btn bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-full text-sm font-semibold shadow-sm hover:bg-blue-50 hover:text-blue-700 hover:border-blue-400 transition flex items-center gap-1.5"><span>🇫🇷</span> 프랑스 (파리)</button>
+            </div>
+
+            <!-- Country Cards Grid -->
+            <div id="countryCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- ITALY CARD -->
+                <div class="country-card italy bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-emerald-700 to-green-600 text-white p-4">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold flex items-center gap-2"><span>🇮🇹</span> 이탈리아</h2>
+                            <span class="text-xs bg-white/20 px-2 py-1 rounded">국제전화 +39</span>
+                        </div>
+                        <p class="text-xs text-emerald-100 mt-1">방문 도시: 로마 (3박), 피렌체 (3박), 베네치아 (당일)</p>
+                    </div>
+
+                    <div class="p-4 space-y-4 text-sm flex-grow">
+                        <div class="bg-emerald-50/60 p-3 rounded-lg border border-emerald-100">
+                            <h3 class="font-bold text-emerald-900 text-xs uppercase tracking-wider mb-2"><i class="fa-solid fa-phone-volume mr-1"></i> 긴급 연락처 & 대사관</h3>
+                            <ul class="space-y-1 text-xs text-slate-700">
+                                <li><strong>통합 긴급구호:</strong> 112 (경찰/구급/소방)</li>
+                                <li><strong>주이탈리아 대사관(로마):</strong> +39 06 802461</li>
+                                <li><strong>대사관 긴급전화:</strong> +39 335 185 0499</li>
+                                <li><strong>주밀라노 총영사관:</strong> +39 02 2900 9703</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5 flex justify-between items-center">
+                                <span><i class="fa-solid fa-comments text-emerald-600 mr-1"></i> 필수 이탈리아어 (클릭 시 발음)</span>
+                                <span class="text-[10px] text-emerald-700 font-normal">🔊 Audio</span>
+                            </h3>
+                            <div class="grid grid-cols-1 gap-1.5 text-xs">
+                                <button onclick="speakPhrase('Buongiorno', 'it-IT', this)" class="audio-btn bg-slate-50 hover:bg-emerald-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-emerald-300 text-left">
+                                    <span><strong>만날 때 (낮):</strong> Buongiorno <span class="text-slate-500 font-normal">(본조르노)</span></span>
+                                    <i class="fa-solid fa-volume-high text-emerald-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Ciao', 'it-IT', this)" class="audio-btn bg-slate-50 hover:bg-emerald-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-emerald-300 text-left">
+                                    <span><strong>안녕/잘 가:</strong> Ciao <span class="text-slate-500 font-normal">(차오)</span></span>
+                                    <i class="fa-solid fa-volume-high text-emerald-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Arrivederci', 'it-IT', this)" class="audio-btn bg-slate-50 hover:bg-emerald-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-emerald-300 text-left">
+                                    <span><strong>헤어질 때:</strong> Arrivederci <span class="text-slate-500 font-normal">(아리베데르치)</span></span>
+                                    <i class="fa-solid fa-volume-high text-emerald-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Grazie mille', 'it-IT', this)" class="audio-btn bg-slate-50 hover:bg-emerald-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-emerald-300 text-left">
+                                    <span><strong>정말 감사합니다:</strong> Grazie mille <span class="text-slate-500 font-normal">(그라치에 밀레)</span></span>
+                                    <i class="fa-solid fa-volume-high text-emerald-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Per favore', 'it-IT', this)" class="audio-btn bg-slate-50 hover:bg-emerald-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-emerald-300 text-left">
+                                    <span><strong>부탁합니다:</strong> Per favore <span class="text-slate-500 font-normal">(페르 파보레)</span></span>
+                                    <i class="fa-solid fa-volume-high text-emerald-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Quanto costa?', 'it-IT', this)" class="audio-btn bg-slate-50 hover:bg-emerald-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-emerald-300 text-left">
+                                    <span><strong>얼마예요?:</strong> Quanto costa? <span class="text-slate-500 font-normal">(콴토 코스타)</span></span>
+                                    <i class="fa-solid fa-volume-high text-emerald-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Dov e il bagno?', 'it-IT', this)" class="audio-btn bg-slate-50 hover:bg-emerald-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-emerald-300 text-left">
+                                    <span><strong>화장실 어디예요?:</strong> Dov'è il bagno? <span class="text-slate-500 font-normal">(도베 일 바뇨)</span></span>
+                                    <i class="fa-solid fa-volume-high text-emerald-600"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-bus text-emerald-600 mr-1"></i> 교통 & 이동 팁</h3>
+                            <ul class="text-xs text-slate-600 space-y-1 bg-emerald-50 p-2.5 rounded border border-emerald-100">
+                                <li>• <strong>로마 FCO 공항 → 로마 시내(아우렐리아누스 성벽 안): 택시 고정요금 48유로</strong> — 공식 흰색 택시 이용. 테르미니역은 <strong>Leonardo Express 14유로 / 약 32분</strong>이 가장 편리.</li>
+                                <li>• <strong>피렌체:</strong> 공항 T2 트램이 시내 중심까지 약 20분. 공항↔역사 지구 택시는 <strong>28유로(평일) / 30유로(공휴일) / 32유로(야간)</strong> 고정요금이며 수하물·시간대 할증은 별도.</li>
+                                <li>• <strong>기본 원칙:</strong> 이탈리아 택시는 공식 승강장의 흰색 차량을 이용하고, 요금이 정해진 공항 노선은 승차 전 목적지를 확인.</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-cloud-sun text-amber-500 mr-1"></i> 현지 날씨</h3>
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <a href="https://www.accuweather.com/ko/it/rome/213490/october-weather/213490" target="_blank" class="bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded text-slate-700 font-medium transition">☀️ 로마 날씨</a>
+                                <a href="https://www.accuweather.com/ko/it/florence/216535/october-weather/216535" target="_blank" class="bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded text-slate-700 font-medium transition">☀️ 피렌체 날씨</a>
+                                <a href="https://www.accuweather.com/ko/it/venice/216711/october-weather/216711" target="_blank" class="bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded text-slate-700 font-medium transition">☀️ 베네치아 날씨</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-utensils text-rose-500 mr-1"></i> 대표 음식 & 유의사항</h3>
+                            <ul class="text-xs text-slate-600 space-y-1 bg-rose-50 p-2.5 rounded border border-rose-100">
+                                <li>• 카르보나라, 피렌체 T본 스테이크, 베네치아 먹물 리조또.</li>
+                                <li>• 테르미니역 주변 및 메트로 A선 소매치기 주의.</li>
+                                <li>• 성당 입장 시 어깨/무릎 노출 제한 복장 체크.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SPAIN CARD -->
+                <div class="country-card spain bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-orange-600 to-amber-600 text-white p-4">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold flex items-center gap-2"><span>🇪🇸</span> 스페인</h2>
+                            <span class="text-xs bg-white/20 px-2 py-1 rounded">국제전화 +34</span>
+                        </div>
+                        <p class="text-xs text-orange-100 mt-1">방문 도시: 바르셀로나 (3박)</p>
+                    </div>
+
+                    <div class="p-4 space-y-4 text-sm flex-grow">
+                        <div class="bg-orange-50/60 p-3 rounded-lg border border-orange-100">
+                            <h3 class="font-bold text-orange-900 text-xs uppercase tracking-wider mb-2"><i class="fa-solid fa-phone-volume mr-1"></i> 긴급 연락처 & 대사관</h3>
+                            <ul class="space-y-1 text-xs text-slate-700">
+                                <li><strong>통합 긴급구호:</strong> 112 / <strong>경찰:</strong> 091</li>
+                                <li><strong>주바르셀로나 총영사관:</strong> +34 93 487 3112</li>
+                                <li><strong>총영사관 긴급전화:</strong> +34 682 862 610</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5 flex justify-between items-center">
+                                <span><i class="fa-solid fa-comments text-orange-600 mr-1"></i> 필수 스페인어 (클릭 시 발음)</span>
+                                <span class="text-[10px] text-orange-700 font-normal">🔊 Audio</span>
+                            </h3>
+                            <div class="grid grid-cols-1 gap-1.5 text-xs">
+                                <button onclick="speakPhrase('Hola', 'es-ES', this)" class="audio-btn bg-slate-50 hover:bg-orange-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-orange-300 text-left">
+                                    <span><strong>안녕하세요:</strong> ¡Hola! <span class="text-slate-500 font-normal">(올라)</span></span>
+                                    <i class="fa-solid fa-volume-high text-orange-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Adios', 'es-ES', this)" class="audio-btn bg-slate-50 hover:bg-orange-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-orange-300 text-left">
+                                    <span><strong>안녕히 가세요:</strong> ¡Adiós! <span class="text-slate-500 font-normal">(아디오스)</span></span>
+                                    <i class="fa-solid fa-volume-high text-orange-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Gracias', 'es-ES', this)" class="audio-btn bg-slate-50 hover:bg-orange-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-orange-300 text-left">
+                                    <span><strong>감사합니다:</strong> Gracias <span class="text-slate-500 font-normal">(그라시아스)</span></span>
+                                    <i class="fa-solid fa-volume-high text-orange-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Por favor', 'es-ES', this)" class="audio-btn bg-slate-50 hover:bg-orange-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-orange-300 text-left">
+                                    <span><strong>부탁합니다:</strong> Por favor <span class="text-slate-500 font-normal">(포르 파보르)</span></span>
+                                    <i class="fa-solid fa-volume-high text-orange-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Perdon', 'es-ES', this)" class="audio-btn bg-slate-50 hover:bg-orange-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-orange-300 text-left">
+                                    <span><strong>실례합니다/죄송합니다:</strong> Perdón <span class="text-slate-500 font-normal">(페르돈)</span></span>
+                                    <i class="fa-solid fa-volume-high text-orange-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Cuanto cuesta esto?', 'es-ES', this)" class="audio-btn bg-slate-50 hover:bg-orange-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-orange-300 text-left">
+                                    <span><strong>이거 얼마예요?:</strong> ¿Cuánto cuesta esto? <span class="text-slate-500 font-normal">(콴토 퀘스타 에스토)</span></span>
+                                    <i class="fa-solid fa-volume-high text-orange-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Donde esta el bano?', 'es-ES', this)" class="audio-btn bg-slate-50 hover:bg-orange-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-orange-300 text-left">
+                                    <span><strong>화장실 어디예요?:</strong> ¿Dónde está el baño? <span class="text-slate-500 font-normal">(돈데 에스타 엘 바뇨)</span></span>
+                                    <i class="fa-solid fa-volume-high text-orange-600"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-bus text-orange-600 mr-1"></i> 교통 & 이동 팁</h3>
+                            <ul class="text-xs text-slate-600 space-y-1 bg-orange-50 p-2.5 rounded border border-orange-100">
+                                <li>• <strong>T-familia(8회권): 11.5유로</strong> — 바르셀로나 시내 대중교통 이용 시 참고.</li>
+                                <li>• <strong>공항 택시:</strong> 바르셀로나 공항(BCN) → 시내는 <strong>정액요금이 아니라 미터요금</strong>이며, 2026년 공항 출발 택시는 <strong>최소 21유로</strong>(공항 할증 4.60유로 포함)입니다. 목적지·시간·교통상황에 따라 실제 요금은 더 올라갑니다.</li>
+                                <li>• <strong>택시:</strong> FreeNow 앱 이용 또는 초록색 불을 켜고 지나가는 <strong>노랑+검정 정식 택시</strong>를 직접 손을 들어 잡는 것이 가장 빠름.</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-cloud-sun text-amber-500 mr-1"></i> 현지 날씨</h3>
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <a href="https://www.accuweather.com/ko/es/barcelona/307297/october-weather/307297" target="_blank" class="bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded text-slate-700 font-medium transition">☀️ 바르셀로나 날씨</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-utensils text-rose-500 mr-1"></i> 대표 음식 & 유의사항</h3>
+                            <ul class="text-xs text-slate-600 space-y-1 bg-amber-50 p-2.5 rounded border border-amber-100">
+                                <li>• 해산물 파에야, 꿀대구, 하몽 이베리코, 샹그리아.</li>
+                                <li>• 람블라 거리 및 람블라/고딕지구 야외테이블 소매치기 유의.</li>
+                                <li>• 사그라다 파밀리아, 구엘공원 타임슬롯 지정시간 엄수.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FRANCE CARD -->
+                <div class="country-card france bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-blue-700 to-indigo-700 text-white p-4">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold flex items-center gap-2"><span>🇫🇷</span> 프랑스</h2>
+                            <span class="text-xs bg-white/20 px-2 py-1 rounded">국제전화 +33</span>
+                        </div>
+                        <p class="text-xs text-blue-100 mt-1">방문 도시: 파리 (4박)</p>
+                    </div>
+
+                    <div class="p-4 space-y-4 text-sm flex-grow">
+                        <div class="bg-blue-50/60 p-3 rounded-lg border border-blue-100">
+                            <h3 class="font-bold text-blue-900 text-xs uppercase tracking-wider mb-2"><i class="fa-solid fa-phone-volume mr-1"></i> 긴급 연락처 & 대사관</h3>
+                            <ul class="space-y-1 text-xs text-slate-700">
+                                <li><strong>통합 긴급구호:</strong> 112 / <strong>경찰:</strong> 17</li>
+                                <li><strong>주프랑스 대사관(파리):</strong> +33 1 47 53 17 00</li>
+                                <li><strong>대사관 긴급전화:</strong> +33 6 80 56 94 54</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5 flex justify-between items-center">
+                                <span><i class="fa-solid fa-comments text-blue-600 mr-1"></i> 필수 프랑스어 (클릭 시 발음)</span>
+                                <span class="text-[10px] text-blue-700 font-normal">🔊 Audio</span>
+                            </h3>
+                            <div class="grid grid-cols-1 gap-1.5 text-xs">
+                                <button onclick="speakPhrase('Bonjour', 'fr-FR', this)" class="audio-btn bg-slate-50 hover:bg-blue-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-blue-300 text-left">
+                                    <span><strong>안녕하세요:</strong> Bonjour <span class="text-slate-500 font-normal">(봉주르)</span></span>
+                                    <i class="fa-solid fa-volume-high text-blue-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Au revoir', 'fr-FR', this)" class="audio-btn bg-slate-50 hover:bg-blue-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-blue-300 text-left">
+                                    <span><strong>안녕히 가세요:</strong> Au revoir <span class="text-slate-500 font-normal">(오 르부아르)</span></span>
+                                    <i class="fa-solid fa-volume-high text-blue-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Merci beaucoup', 'fr-FR', this)" class="audio-btn bg-slate-50 hover:bg-blue-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-blue-300 text-left">
+                                    <span><strong>정말 감사합니다:</strong> Merci beaucoup <span class="text-slate-500 font-normal">(메르시 보쿠)</span></span>
+                                    <i class="fa-solid fa-volume-high text-blue-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Sil vous plait', 'fr-FR', this)" class="audio-btn bg-slate-50 hover:bg-blue-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-blue-300 text-left">
+                                    <span><strong>부탁합니다:</strong> S'il vous plaît <span class="text-slate-500 font-normal">(실 부 플레)</span></span>
+                                    <i class="fa-solid fa-volume-high text-blue-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Excusez-moi', 'fr-FR', this)" class="audio-btn bg-slate-50 hover:bg-blue-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-blue-300 text-left">
+                                    <span><strong>실례합니다:</strong> Excusez-moi <span class="text-slate-500 font-normal">(엑스퀴제 무아)</span></span>
+                                    <i class="fa-solid fa-volume-high text-blue-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Combien ca coute?', 'fr-FR', this)" class="audio-btn bg-slate-50 hover:bg-blue-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-blue-300 text-left">
+                                    <span><strong>얼마예요?:</strong> Combien ça coûte? <span class="text-slate-500 font-normal">(콤비앙 사 쿠트)</span></span>
+                                    <i class="fa-solid fa-volume-high text-blue-600"></i>
+                                </button>
+                                <button onclick="speakPhrase('Ou sont les toilettes?', 'fr-FR', this)" class="audio-btn bg-slate-50 hover:bg-blue-100 p-2 rounded flex justify-between items-center border border-slate-200 hover:border-blue-300 text-left">
+                                    <span><strong>화장실 어디예요?:</strong> Où sont les toilettes? <span class="text-slate-500 font-normal">(우 손 레 토알렛)</span></span>
+                                    <i class="fa-solid fa-volume-high text-blue-600"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-bus text-blue-600 mr-1"></i> 교통 & 이동 팁</h3>
+                            <ul class="text-xs text-slate-600 space-y-1 bg-blue-50 p-2.5 rounded border border-blue-100">
+                                <li>• <strong>CDG 공항 ↔ 파리 시내: 택시 고정요금 56유로(센 강 우안) / 65유로(좌안)</strong>. 파리 공식 택시 승강장을 이용하면 됨.</li>
+                                <li>• <strong>공항 대중교통:</strong> CDG는 RER B, 오를리는 메트로 14호선으로 이동 가능. <strong>Paris Région ↔ Aéroports 티켓 14유로/편도</strong>(2026년 기준).</li>
+                                <li>• <strong>Navigo Semaine:</strong> 2026년 전 구간(1~5존) <strong>32.40유로</strong>. Navigo Découverte 카드가 필요하면 <strong>5유로</strong>가 추가되어 총 37.40유로. 단, 주간권은 <strong>월~일 고정 주간</strong>이라 여행 날짜에 맞춰 구매.</li>
+                                <li>• <strong>이번 여행:</strong> 10/27~10/31은 같은 주간권 적용 기간이므로 파리 시내 이동이 많다면 Navigo Semaine을 우선 고려.</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-b pb-3">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-cloud-sun text-amber-500 mr-1"></i> 현지 날씨</h3>
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <a href="https://www.accuweather.com/ko/fr/paris/623/october-weather/623" target="_blank" class="bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded text-slate-700 font-medium transition">☀️ 파리 날씨</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-xs uppercase mb-1.5"><i class="fa-solid fa-utensils text-rose-500 mr-1"></i> 대표 음식 & 유의사항</h3>
+                            <ul class="text-xs text-slate-600 space-y-1 bg-blue-50 p-2.5 rounded border border-blue-100">
+                                <li>• 바게트, 에스카르고(달팽이), 양파스프, 오리가슴살, 마카롱.</li>
+                                <li>• 몽마르트르 팔찌 강매 및 에펠탑 서명 스캠 유의.</li>
+                                <li>• 센강 유람선 밤바람 대비 경량패딩 소지.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PAGE 2: 여행계획 (일정표 & 구글맵) -->
+        <section id="page-itinerary" class="page-content hidden space-y-6">
+
+            <!-- Day Selector Bar -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-calendar-day mr-1"></i> 날짜 선택</span>
+                    <span class="text-xs text-blue-600 font-medium">총 14일간의 상세 여행일정</span>
+                </div>
+                <div class="flex gap-1.5 overflow-x-auto pb-1" id="dayFilterButtons">
+                    <!-- Dynamic Buttons Generated by JS -->
+                </div>
+            </div>
+
+            <!-- Itinerary Content Container -->
+            <div id="itineraryContainer" class="space-y-6">
+                <!-- Day details injected via Javascript -->
+            </div>
+
+        </section>
+
+        <!-- PAGE 3: 준비물 & 체크리스트 (사용자 작성 내용 완벽 대입 기능) -->
+        <section id="page-checklist" class="page-content hidden space-y-6">
+
+            <!-- Checklist Progress Header -->
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-5 rounded-xl shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-clipboard-check"></i> 여행 준비물 체크리스트</h2>
+                    <p class="text-xs text-emerald-100 mt-1">항목을 직접 수정, 삭제, 추가하거나 내 준비물 리스트를 한 번에 붙여넣어 관리하세요!</p>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                    <button onclick="toggleChecklistImporter()" class="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-2 rounded-lg border border-white/20 transition flex items-center gap-1">
+                        <i class="fa-solid fa-file-import"></i> 내 리스트 붙여넣기
+                    </button>
+                    <div class="bg-white/10 px-4 py-1.5 rounded-lg text-center border border-white/20">
+                        <div class="text-[10px] text-emerald-200">준비 완료율</div>
+                        <div class="text-xl font-black text-white" id="checklistProgressPercent">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bulk Importer Box (Hidden by Default) -->
+            <div id="checklistImporterBox" class="hidden bg-slate-900 text-white p-4 rounded-xl shadow-md space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-sm text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-paste"></i> 작성해둔 준비물 텍스트 한 번에 등록하기
+                    </h3>
+                    <button onclick="toggleChecklistImporter()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <p class="text-xs text-slate-300">작성하신 준비물을 한 줄에 하나씩 입력하거나 붙여넣으세요. 입력 후 '내 리스트 적용하기'를 누르면 바로 체크리스트에 등록됩니다.</p>
+                <textarea id="bulkChecklistTextarea" rows="4" placeholder="예:&#10;여권 및 여권 사본&#10;유럽 멀티 어댑터&#10;상비약 (타이레놀, 소화제)&#10;개인 화장품" class="w-full p-2.5 text-xs text-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"></textarea>
+                <div class="flex justify-between items-center gap-2">
+                    <select id="bulkChecklistCategory" class="px-2 py-1.5 text-xs rounded bg-slate-800 text-white border border-slate-700">
+                        <option value="essential">필수 서류/금융 카테고리로 추가</option>
+                        <option value="electronics">전자기기 카테고리로 추가</option>
+                        <option value="clothes">의류/잡화 카테고리로 추가</option>
+                        <option value="toiletries">위생/의약품 카테고리로 추가</option>
+                        <option value="misc" selected>기타/보안 카테고리로 추가</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <button onclick="replaceChecklistWithBulk()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-bold transition">전체 교체하기</button>
+                        <button onclick="addBulkChecklist()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-bold transition">기존 목록에 추가하기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Single Item Input Bar -->
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-2">
+                <input type="text" id="newChecklistItemInput" placeholder="추가할 준비물을 입력하세요 (예: 핫팩, 목베개 등)" class="flex-grow px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <select id="newChecklistCategorySelect" class="px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm bg-slate-50 focus:outline-none">
+                    <option value="essential">필수 서류/금융</option>
+                    <option value="electronics">전자기기</option>
+                    <option value="clothes">의류/잡화</option>
+                    <option value="toiletries">위생/의약품</option>
+                    <option value="misc">기타/보안</option>
+                </select>
+                <button onclick="addCustomChecklistItem()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> 추가</button>
+            </div>
+
+            <!-- Checklist Categories Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="checklistCategoriesContainer">
+                <!-- Checklist groups rendered dynamically -->
+            </div>
+
+            <div class="flex justify-end gap-2 text-xs text-slate-500 pt-2">
+                <button onclick="clearAllChecklist()" class="hover:text-rose-600 underline"><i class="fa-solid fa-trash-can mr-1"></i> 준비물 전체 삭제</button>
+                <span>·</span>
+                <button onclick="resetChecklistToDefault()" class="hover:text-blue-600 underline"><i class="fa-solid fa-rotate-left mr-1"></i> 샘플 리스트로 복원</button>
+            </div>
+
+        </section>
+
+        <!-- PAGE 4: 예산관리 (사전 집행 항목 및 현지 지출 완벽 편집 기능) -->
+        <section id="page-budget" class="page-content hidden space-y-6">
+
+            <!-- Budget Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="text-xs font-semibold text-slate-500">총 사전 집행 내역 (KRW)</div>
+                    <div class="text-xl font-bold text-slate-900 mt-1" id="totalPrepaidDisplay">₩0</div>
+                    <div class="text-xs text-slate-400 mt-1">항공, 숙소, 열차, 티켓 등 직접 입력 금액 합계</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="text-xs font-semibold text-slate-500">현지 예상/추가 지출액</div>
+                    <div class="text-xl font-bold text-blue-600 mt-1" id="totalOnsiteDisplay">€0</div>
+                    <div class="text-xs text-slate-400 mt-1" id="totalOnsiteKRWDisplay">약 ₩0</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="text-xs font-semibold text-slate-500">총 여행 예산 지출 합계</div>
+                    <div class="text-xl font-bold text-indigo-700 mt-1" id="grandTotalDisplay">₩0</div>
+                    <div class="text-xs text-slate-400 mt-1">사전 집행 + 현지 지출 합산</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="text-xs font-semibold text-slate-500">적용 유로 환율 (1€)</div>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span class="text-sm font-bold text-slate-700">₩</span>
+                        <input type="number" id="fxRateInput" value="1480" class="w-24 px-2 py-0.5 border border-slate-300 rounded text-sm font-bold text-amber-600" onchange="updateFxRate(this.value)">
+                    </div>
+                    <div class="text-xs text-slate-400 mt-1">수정 가능 (기본: 1,480원)</div>
+                </div>
+            </div>
+
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3 rounded-xl text-xs">
+                <i class="fa-solid fa-file-excel mr-1"></i>
+                <strong>예산 집행 내역.xlsx 기준으로 동기화됨:</strong>
+                현재까지 원화 금액이 명시된 집행액 <strong>₩14,057,679</strong>을 반영했습니다.
+                유로로만 기재된 현지구입/예정 항목은 원화 집행액에 포함하지 않았습니다.
+            </div>
+
+            <!-- Currency Converter Utility Card -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-4 rounded-xl shadow">
+                <h3 class="font-bold text-sm mb-2 flex items-center gap-2"><i class="fa-solid fa-calculator text-amber-400"></i> 실시간 현지 유로-원화 약산 계산기</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-800">
+                    <div class="flex items-center bg-white rounded-lg px-3 py-1.5">
+                        <span class="text-sm font-bold text-slate-500 mr-2">€ (EUR)</span>
+                        <input type="number" id="calcEur" placeholder="예: 50" class="w-full text-base font-bold focus:outline-none" oninput="convertEurToKrw(this.value)">
+                    </div>
+                    <div class="flex items-center bg-slate-100 rounded-lg px-3 py-1.5 text-slate-700 font-bold">
+                        <span class="text-sm text-slate-500 mr-2">₩ (KRW)</span>
+                        <span id="calcKrwResult" class="text-base text-emerald-600 font-extrabold">0 원</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Form Input Box -->
+            <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2" id="expenseFormTitle">
+                        <i class="fa-solid fa-plus-circle text-blue-600"></i> <span id="formTitleText">사전 집행 항목 추가하기 (원화 ₩)</span>
+                    </h3>
+                    <div class="text-xs text-slate-500 space-x-2">
+                        <button onclick="setExpenseType('prepaid')" id="typeBtnPrepaid" class="px-2.5 py-1 rounded-md font-bold bg-blue-600 text-white">사전 집행 (₩)</button>
+                        <button onclick="setExpenseType('onsite')" id="typeBtnOnsite" class="px-2.5 py-1 rounded-md font-bold bg-slate-200 text-slate-700 hover:bg-slate-300">현지 지출 (€)</button>
+                    </div>
+                </div>
+
+                <!-- PREPAID FORM (KRW) -->
+                <div id="formPrepaid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <input type="text" id="prepaidTitle" placeholder="항목명 (예: 항공권, 로마 숙소)" class="px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm">
+                    <select id="prepaidCategory" class="px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm">
+                        <option value="항공">✈️ 항공</option>
+                        <option value="숙소">🏨 숙소</option>
+                        <option value="교통">🚆 교통</option>
+                        <option value="열차">🚆 열차</option>
+                        <option value="투어">🚩 가이드 투어</option>
+                        <option value="입장권">🎟️ 입장권</option>
+                        <option value="준비물">🧳 준비물</option>
+                        <option value="기타">💡 기타</option>
+                    </select>
+                    <input type="text" id="prepaidDesc" placeholder="상세 설명 (예: 대한항공 직항)" class="px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm">
+                    <div class="flex items-center border border-slate-300 rounded-lg px-2 bg-white">
+                        <span class="text-xs text-slate-400 font-bold mr-1">₩</span>
+                        <input type="number" id="prepaidAmount" placeholder="금액 (원)" class="w-full py-2 text-xs sm:text-sm focus:outline-none">
+                    </div>
+                    <button onclick="addPrepaidExpense()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">등록하기</button>
+                </div>
+
+                <!-- ONSITE FORM (EUR) -->
+                <div id="formOnsite" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 hidden">
+                    <input type="date" id="expenseDate" class="px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm">
+                    <input type="text" id="expenseTitle" placeholder="내역 (예: 로마 파스타 식사)" class="px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm">
+                    <select id="expenseCategory" class="px-3 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm">
+                        <option value="식비">🍽️ 식비</option>
+                        <option value="교통">🚌 교통</option>
+                        <option value="입장권/투어">🎟️ 입장권/투어</option>
+                        <option value="쇼핑">🛍️ 쇼핑</option>
+                        <option value="숙박">🏨 숙박</option>
+                        <option value="기타">💡 기타</option>
+                    </select>
+                    <div class="flex items-center border border-slate-300 rounded-lg px-2 bg-white">
+                        <span class="text-xs text-slate-400 font-bold mr-1">€</span>
+                        <input type="number" id="expenseAmountEur" placeholder="금액 (EUR)" class="w-full py-2 text-xs sm:text-sm focus:outline-none">
+                    </div>
+                    <button onclick="addOnsiteExpense()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">등록하기</button>
+                </div>
+            </div>
+
+            <!-- Expense Tabs (Prepaid vs Onsite) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="border-b border-slate-200 flex bg-slate-50">
+                    <button onclick="toggleExpenseView('prepaid')" id="btn-exp-prepaid" class="flex-1 py-3 px-4 font-bold text-sm text-center text-blue-600 border-b-2 border-blue-600">
+                        📋 사전 집행 내역 (원화 ₩)
+                    </button>
+                    <button onclick="toggleExpenseView('onsite')" id="btn-exp-onsite" class="flex-1 py-3 px-4 font-bold text-sm text-center text-slate-500 hover:text-slate-800">
+                        💳 현지 추가 지출 기록 (유로 €)
+                    </button>
+                </div>
+
+                <!-- Prepaid Expenses Table -->
+                <div id="prepaidExpensesList" class="p-4 overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-bold text-xs">
+                            <tr>
+                                <th class="p-2.5 rounded-l">항목명</th>
+                                <th class="p-2.5">구분</th>
+                                <th class="p-2.5">상세설명</th>
+                                <th class="p-2.5 text-right">금액 (원)</th>
+                                <th class="p-2.5 text-center rounded-r">삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prepaidTableBody" class="divide-y divide-slate-100">
+                            <!-- Injected via JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="noPrepaidExpenses" class="text-center py-6 text-slate-400 text-xs hidden">
+                        사전 집행 항목이 없습니다. 상단 입력 폼에서 추가해주세요.
+                    </div>
+                    <div class="flex justify-end gap-2 text-xs text-slate-500 pt-3 border-t mt-3">
+                        <button onclick="clearAllPrepaid()" class="hover:text-rose-600 underline"><i class="fa-solid fa-trash-can mr-1"></i> 사전 집행 전체 삭제</button>
+                    </div>
+                </div>
+
+                <!-- Onsite Expenses Table -->
+                <div id="onsiteExpensesList" class="p-4 overflow-x-auto hidden">
+                    <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-bold text-xs">
+                            <tr>
+                                <th class="p-2.5 rounded-l">날짜</th>
+                                <th class="p-2.5">항목명</th>
+                                <th class="p-2.5">카테고리</th>
+                                <th class="p-2.5 text-right">유로 (€)</th>
+                                <th class="p-2.5 text-right">원화 환산 (₩)</th>
+                                <th class="p-2.5 text-center rounded-r">삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody id="onsiteTableBody" class="divide-y divide-slate-100">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                    <div id="noOnsiteExpenses" class="text-center py-8 text-slate-400 text-xs">
+                        아직 추가된 현지 지출 내역이 없습니다. 상단 폼에서 지출을 기록해보세요!
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs text-center py-6 mt-8 border-t border-slate-800">
+        <div class="max-w-5xl mx-auto px-4 space-y-2">
+            <p>2026 가을 유럽여행 스마트 가이드 핸드북 · 10/18 ~ 10/31 (13박 14일)</p>
+            <p class="text-slate-500">로마 · 피렌체 · 베네치아 · 바르셀로나 · 파리 | 단일 HTML 웹 애플리케이션</p>
+        </div>
+    </footer>
+
+    <script>
+        // Master Data for 14-Day Itinerary
+        const itineraryData = [{"day": 1, "date": "10/18 (일)", "city": "로마", "country": "이탈리아", "flag": "🇮🇹", "theme": "로마 입국 및 숙소 이동", "schedules": [{"time": "19:40", "title": "로마 피우미치노 공항(FCO) 도착 및 입국 수속", "desc": "E-GATE에서 한국 국기 표시를 확인하고 입국 수속. 수하물 수령 후 train 표지를 따라 철도 승강장으로 이동.", "map": "FCO Airport", "buffer": null}, {"time": "20:50~21:20", "title": "레오나르도 익스프레스 직통열차", "desc": "Leonardo Express / Roma Termini 확인. 자유석으로 FCO 공항에서 로마 테르미니역까지 약 32분 이동. 게이트 가장 우측 tap&go 게이트에 카드를 대고 1~2초 기다린 뒤 화면에 초록색 불이 들어오는지 확인 후 입장.", "map": "Roma Termini", "buffer": "참고: 표 검사 시 알림 확인 문자를 보내면 됨"}, {"time": "22:00", "title": "Lexie Suites 체크인 및 휴식", "desc": "테르미니역 인근 Lexie Suites 체크인 후 휴식.", "map": "Lexie Suites Rome", "buffer": null}]}, {"day": 2, "date": "10/19 (월)", "city": "로마", "country": "이탈리아", "flag": "🇮🇹", "theme": "바티칸 & 로마 핵심 시내", "schedules": [{"time": "07:30~08:00", "title": "조식", "desc": "숙소 인근 카페에서 커피와 코르네토.", "map": null, "buffer": null}, {"time": "08:00~08:40", "title": "테르미니 → Ottaviano 이동", "desc": "테르미니역에서 메트로 A선(오렌지색 라인) Batistini 방향 탑승 → Ottaviano역 하차. 자판기 인근 미팅.", "map": "Ottaviano Station Rome", "buffer": null}, {"time": "09:05~13:30", "title": "바티칸 박물관 & 성 베드로 대성당", "desc": "바티칸 박물관과 성 베드로 대성당 관람. 박물관 관람 후 성 베드로 대성당으로 이동.", "map": "Vatican Museums", "buffer": "입장지정시간 09:05"}, {"time": "13:30~15:00", "title": "점심 식사", "desc": "바티칸 인근에서 점심 식사.", "map": "Vatican City Restaurants", "buffer": null}, {"time": "15:00~19:00", "title": "로마 핵심 시내 도보 이동", "desc": "산탄젤로성 외관 → 성천사의 다리 → 나보나 광장 → 판테온 → 트레비 분수 순서로 이동. 판테온은 17:00 예약.", "map": "Pantheon Rome", "buffer": "판테온 17:00 예약"}, {"time": "19:30", "title": "저녁식사", "desc": "트레비 분수 일정 후 저녁식사.", "map": "Trevi Fountain Rome", "buffer": null}]}, {"day": 3, "date": "10/20 (화)", "city": "로마", "country": "이탈리아", "flag": "🇮🇹", "theme": "고대 로마 역사 탐방", "schedules": [{"time": "09:00~11:30", "title": "콜로세움 & 콘스탄티누스 개선문", "desc": "버스 이동 후 콜로세움 09:00 예약 입장 및 콘스탄티누스 개선문 관람.", "map": "Colosseum Rome", "buffer": "콜로세움 09:00 예약"}, {"time": "11:30~13:30", "title": "포로 로마노 & 팔라티노 언덕", "desc": "포로 로마노와 팔라티노 언덕 관람.", "map": "Roman Forum", "buffer": null}, {"time": "13:30~15:00", "title": "점심식사", "desc": "콜로세움·포로 로마노 일정 후 점심식사.", "map": "Colosseum Nearby Restaurants", "buffer": null}, {"time": "15:30~17:30", "title": "캄피돌리오 광장 → 조국의 제단", "desc": "도보 이동. 캄피돌리오 광장은 뒤쪽으로 돌아가면 포로 로마노를 한눈에 볼 수 있음 → 조국의 제단.", "map": "Piazza del Campidoglio", "buffer": null}, {"time": "17:30~19:00", "title": "스페인 계단", "desc": "도보 이동으로 스페인 계단 관람. 택시 호출이 어렵고 교통체증이 심하므로 이동에 유의.", "map": "Spanish Steps Rome", "buffer": "택시호출이 어렵고 교통체증이 심함"}, {"time": "19:30", "title": "저녁", "desc": "스페인 계단 일정 후 저녁식사.", "map": "Piazza di Spagna", "buffer": null}]}, {"day": 4, "date": "10/21 (수)", "city": "로마 → 피렌체", "country": "이탈리아", "flag": "🇮🇹", "theme": "토스카나 이동 투어", "schedules": [{"time": "06:30", "title": "토스카나 투어버스 미팅", "desc": "HOTEL CANADA 앞 미팅 후 토스카나 투어버스 탑승.", "map": "Hotel Canada Rome", "buffer": null}, {"time": "06:30~16:40", "title": "토스카나 투어", "desc": "투어 버스로 치비타 디 반뇨레죠 → 발도르차 → 몬테풀치아노 일정 진행.", "map": "Civita di Bagnoregio", "buffer": null}, {"time": "16:40~17:10", "title": "피렌체 SMN역 도착", "desc": "트램 이동으로 피렌체 SMN역 도착.", "map": "Firenze Santa Maria Novella", "buffer": null}, {"time": "17:30", "title": "Marco's Way 체크인", "desc": "숙소 체크인. 유료 세탁은 약 8유로이며 수건은 이틀에 한 번씩 제공.", "map": "Marcos Way Florence", "buffer": "숙소 참고: 유료 세탁 약 8유로 / 수건 이틀에 한 번"}, {"time": "19:00", "title": "저녁 식사 & 두오모 야경", "desc": "저녁 식사 후 피렌체 대성당(두오모) 야경 산책.", "map": "Florence Cathedral", "buffer": null}]}, {"day": 5, "date": "10/22 (목)", "city": "피렌체", "country": "이탈리아", "flag": "🇮🇹", "theme": "피렌체 르네상스 예술 탐방", "schedules": [{"time": "08:30", "title": "피렌체 구도심 도보 이동", "desc": "산타마리아노벨라 성당 → 피렌체 중앙시장(가죽시장) → 산로렌초 성당 → 피렌체 대성당.", "map": "Piazza di Santa Maria Novella", "buffer": null}, {"time": "12:00~13:30", "title": "점심식사", "desc": "View on Art Rooftop Cocktail Bar에서 점심식사.", "map": "View on Art Rooftop Florence", "buffer": null}, {"time": "13:30", "title": "피렌체 르네상스 핵심 동선", "desc": "피렌체 대성당 내부관람 → 레푸블리카 광장(지나가면서) → 시뇨리아 광장 → 베키오 궁(지나가면서) → 우피치 외관(지나가면서) → 베키오 다리.", "map": "Ponte Vecchio", "buffer": null}, {"time": "17:00~19:00", "title": "베키오 다리 → 미켈란젤로 광장", "desc": "택시 이동으로 베키오 다리에서 미켈란젤로 광장으로 이동해 일몰 감상.", "map": "Piazzale Michelangelo", "buffer": "일몰 18:20경. 17:30까지 광장 도착 권장 / 겉옷 준비"}, {"time": "19:30", "title": "시내 복귀 후 저녁 식사", "desc": "미켈란젤로 광장에서 시내로 복귀 후 저녁식사.", "map": "Piazza della Signoria", "buffer": null}]}, {"day": 6, "date": "10/23 (금)", "city": "베네치아 (당일치기)", "country": "이탈리아", "flag": "🇮🇹", "theme": "베네치아 당일치기", "schedules": [{"time": "08:10~08:39", "title": "테르미니역 이동", "desc": "피렌체 SMN역 출발 전 역으로 이동.", "map": "Firenze Santa Maria Novella", "buffer": null}, {"time": "08:39~10:55", "title": "이딸로(Italo) 탑승", "desc": "피렌체 SMN역 → 베네치아 S. Lucia역. 약 2시간 15분 소요.", "map": "Stazione di Venezia Santa Lucia", "buffer": null}, {"time": "11:15~11:35", "title": "바포레토 Line 1 → Accademia", "desc": "Ferrovia B 선착장에서 Line 1 탑승 → Accademia 하차. 약 20분 소요.", "map": "Accademia Venice", "buffer": null}, {"time": "11:35~12:20", "title": "아카데미아 다리 → 산마르코 광장", "desc": "도보 이동으로 아카데미아 다리에서 산마르코 광장까지 이동.", "map": "Piazza San Marco", "buffer": null}, {"time": "12:30~14:00", "title": "산마르코 대성당 & 박물관 & 테라스", "desc": "산마르코 대성당 12:30~13:00 예약 관람 후 박물관과 테라스 관람.", "map": "St. Mark's Basilica", "buffer": "산마르코 대성당 12:30~13:00 예약"}, {"time": "14:00~15:00", "title": "점심식사", "desc": "산마르코 일정 후 점심식사.", "map": "St Marks Square Restaurants", "buffer": null}, {"time": "15:00~16:00", "title": "두칼레 궁전 외관 & 탄식의 다리", "desc": "두칼레 궁전은 외관만 관람하고 탄식의 다리까지 이동.", "map": "Bridge of Sighs", "buffer": null}, {"time": "16:00~17:30", "title": "산마르코 → 리알토 → S. Lucia역", "desc": "도보 이동으로 산마르코 → 리알토 다리 → S.Lucia역. 구글맵 기준 약 22분 구간.", "map": "Rialto Bridge", "buffer": "시간 부족 시 17:00경 리알토 다리 또는 산마르코에서 바포레토 탑승"}, {"time": "18:05~20:30", "title": "S. Lucia역 → 피렌체 SMN역 복귀", "desc": "18:05 출발 열차로 피렌체 SMN역 복귀.", "map": "Stazione di Venezia Santa Lucia", "buffer": null}, {"time": "21:00", "title": "피렌체 도착 후 저녁 식사", "desc": "피렌체 도착 후 저녁식사.", "map": "Firenze SMN", "buffer": null}]}, {"day": 7, "date": "10/24 (토)", "city": "피렌체 → 바르셀로나", "country": "스페인", "flag": "🇪🇸", "theme": "바르셀로나 이동", "schedules": [{"time": "11:20~12:00", "title": "피렌체 시내 → 피렌체 공항", "desc": "트램 T2 노선으로 피렌체 시내에서 피렌체 공항(FLR) 이동.", "map": "Florence Airport FLR", "buffer": null}, {"time": "14:10~15:55", "title": "피렌체 → 바르셀로나 항공 이동", "desc": "Vueling 항공으로 피렌체(FLR) → 바르셀로나(BCN) 직항 이동. 약 2시간.", "map": "Josep Tarradellas Barcelona-El Prat Airport", "buffer": null}, {"time": "17:00~17:30", "title": "바르셀로나 공항 → 카탈루냐 광장", "desc": "택시로 바르셀로나 공항에서 카탈루냐 광장 이동.", "map": "Plaça de Catalunya", "buffer": null}, {"time": "18:00", "title": "Rambla 102 체크인", "desc": "숙소 체크인. 세탁기와 건조기 있음.", "map": "Rambla 102 Barcelona", "buffer": "숙소 참고: 세탁기/건조기 있음"}, {"time": "19:00~19:30", "title": "저녁 장소 이동", "desc": "택시로 Salts. Terrassa Bar Montjuïc 이동 또는 고딕지구 야경 산책.", "map": "Salts Terrassa Bar Montjuïc", "buffer": null}, {"time": "19:30~21:00", "title": "저녁식사", "desc": "Salts. Terrassa Bar Montjuïc에서 저녁식사.", "map": "Salts Terrassa Bar Montjuïc", "buffer": null}, {"time": "21:30", "title": "카탈루냐 미술관 앞 몬주익 분수쇼", "desc": "카탈루냐 미술관 앞에서 몬주익 분수쇼 관람. 일정표에는 21:00~21:30으로 기재되어 있음.", "map": "Magic Fountain of Montjuïc", "buffer": "분수쇼 일정표 기재: 21:00~21:30"}]}, {"day": 8, "date": "10/25 (일)", "city": "바르셀로나", "country": "스페인", "flag": "🇪🇸", "theme": "가우디 투어", "schedules": [{"time": "08:40~10:00", "title": "조식 → 구엘공원 이동", "desc": "조식 후 24번 버스(ID 1208) 또는 택시로 구엘공원 이동.", "map": "Park Guell", "buffer": null}, {"time": "10:00~12:00", "title": "구엘공원 내부관람", "desc": "10:00 예약 입장. 구엘공원 내부 관람.", "map": "Park Guell", "buffer": "구엘공원 10:00 예약"}, {"time": "12:00~13:00", "title": "산파우 병원 외관 → 사그라다 파밀리아", "desc": "택시로 산파우 병원으로 이동해 외관만 관람한 뒤 사그라다 파밀리아 성당으로 이동.", "map": "Sant Pau Recinte Modernista", "buffer": null}, {"time": "13:00~15:00", "title": "점심 식사 및 휴식", "desc": "사그라다 파밀리아 인근에서 점심 식사 및 휴식.", "map": "La Sagrada Familia", "buffer": null}, {"time": "15:00~17:00", "title": "사그라다 파밀리아 내부 관람", "desc": "15:00 예약으로 사그라다 파밀리아 내부 관람.", "map": "La Sagrada Familia", "buffer": "사그라다 파밀리아 15:00 예약"}, {"time": "17:00~18:30", "title": "그라시아 거리 이동", "desc": "택시로 그라시아 거리로 이동.", "map": "Passeig de Gracia Barcelona", "buffer": null}, {"time": "18:30~19:30", "title": "카사 밀라·카사 바트요 외관 & 저녁", "desc": "카사 밀라와 카사 바트요 외관 관람 후 저녁식사.", "map": "Casa Batllo", "buffer": null}, {"time": "21:30", "title": "카탈루냐 음악당 Gran Gala Flamenco", "desc": "카탈루냐 음악당에서 Gran Gala Flamenco 공연 관람. 21시까지 입장.", "map": "Palau de la Musica Catalana", "buffer": "21시까지 입장"}]}, {"day": 9, "date": "10/26 (월)", "city": "바르셀로나", "country": "스페인", "flag": "🇪🇸", "theme": "시가지 산책", "schedules": [{"time": "09:00~12:30", "title": "고딕지구 핵심 산책", "desc": "고딕지구 → 라보케리아 시장 → 구엘저택 → 플라카 레이알 광장(가우디 가로 등) → 바실리카 산타 마리아 델 피 성당 → 바르셀로나 대성당 → 비스베 다리 → 왕의 광장.", "map": "Catedral de Barcelona", "buffer": null}, {"time": "12:30~14:00", "title": "점심식사", "desc": "점심식사.", "map": "Gothic Quarter Barcelona", "buffer": null}, {"time": "14:00~18:30", "title": "보른 지구 → 시우타델라 공원 → 개선문", "desc": "보른(Born) 지구 → 바실리카 산타마리아 델 마르 성당 → El Born Centre de Cultura i Memòria(옛 시장터를 복원한 문화센터, 무료, 화장실 있음) → Ciutadella Park → 개선문 → 이후 저녁식사.", "map": "Arc de Triomf Barcelona", "buffer": "El Born Centre: 무료, 화장실 있음"}, {"time": "19:00", "title": "저녁식사", "desc": "보른 지구 일정 후 저녁식사.", "map": "El Born Barcelona", "buffer": null}]}, {"day": 10, "date": "10/27 (화)", "city": "바르셀로나 → 파리", "country": "프랑스", "flag": "🇫🇷", "theme": "파리 이동 & 샹젤리제 야경", "schedules": [{"time": "09:45~10:20", "title": "카탈루냐 광장 → 바르셀로나 공항", "desc": "아에로버스 또는 택시로 BCN 공항 이동.", "map": "Josep Tarradellas Barcelona-El Prat Airport", "buffer": null}, {"time": "12:55~14:45", "title": "바르셀로나 → 파리 오를리 항공 이동", "desc": "IBERIA/Vueling으로 바르셀로나(BCN) → 파리 오를리(ORY) 이동.", "map": "Paris Orly Airport", "buffer": null}, {"time": "15:30~16:30", "title": "오를리 공항 → 숙소", "desc": "우버/Bolt 또는 메트로 14호선으로 숙소 이동.", "map": "Best Western Premier Capital Opera", "buffer": null}, {"time": "17:00", "title": "Best Western Premier Capital Opera 체크인", "desc": "호텔 체크인. 2분 거리 슈퍼마켓·빵집, 무료 사우나, 무료 짐 보관 서비스, 세탁 서비스 참고.", "map": "Best Western Premier Capital Opera", "buffer": "숙소 참고: 슈퍼마켓/빵집 2분, 무료 사우나, 무료 짐 보관, 세탁 서비스"}, {"time": "17:30~19:00", "title": "에투알 개선문 & 샹젤리제 거리", "desc": "지하철로 에투알 개선문과 샹젤리제 거리 야경 관람.", "map": "Arc de Triomphe Paris", "buffer": "피곤할 경우 오페라 가르니에 → 방돔 광장 → 루브르 피라미드 야경으로 대체"}, {"time": "19:00~", "title": "저녁식사", "desc": "샹젤리제 일정 후 저녁식사.", "map": "Champs-Élysées", "buffer": null}]}, {"day": 11, "date": "10/28 (수)", "city": "파리", "country": "프랑스", "flag": "🇫🇷", "theme": "시테섬 & 루브르", "schedules": [{"time": "08:40~09:00", "title": "Saint-Germain-des-Prés 이동", "desc": "메트로 4호선으로 Saint-Germain-des-Prés 역 하차. 약 20분 소요.", "map": "Saint-Germain-des-Prés", "buffer": null}, {"time": "09:00~09:20", "title": "아침식사 테이크아웃", "desc": "아침식사 테이크아웃.", "map": "Saint-Germain-des-Prés", "buffer": null}, {"time": "09:00~09:45", "title": "생제르맹 거리 산책", "desc": "생제르맹 데프레 성당 → Café de Flore → Les Deux Magots → Rue de Buci → 파사주 코트 뒤 코르메르 → Place Saint-Michel → 센강 → 셰익스피어 앤 컴퍼니 순으로 이동.", "map": "Shakespeare and Company", "buffer": null}, {"time": "09:45~10:30", "title": "셰익스피어 앤 컴퍼니", "desc": "10시 오픈하는 셰익스피어 앤 컴퍼니 방문.", "map": "Shakespeare and Company", "buffer": "10시 오픈"}, {"time": "10:50~12:30", "title": "노트르담 대성당", "desc": "10:50 예약으로 노트르담 대성당 관람.", "map": "Cathédrale Notre-Dame de Paris", "buffer": "10.26. 10:00, 48시간 전 티켓 오픈. 모바일앱 Cathédrale Notre-Dame de Paris에서 예매"}, {"time": "13:00~14:00", "title": "생샤펠", "desc": "13시 예약으로 생샤펠 관람.", "map": "Sainte-Chapelle", "buffer": "생샤펠 13시 예약"}, {"time": "14:00~15:30", "title": "점심식사", "desc": "시테섬 일정 후 점심식사.", "map": "Île de la Cité", "buffer": null}, {"time": "15:30~16:30", "title": "퐁뇌프 & 튈르리 정원/카페", "desc": "퐁뇌프와 튈르리 정원·카페에서 산책 및 휴식.", "map": "Jardin des Tuileries", "buffer": null}, {"time": "17:00~20:30", "title": "루브르 박물관 — DENON·SULLY 세부 동선", "desc": "17:00 예약 입장. <strong>DENON 1층 403~404실</strong>: 미켈란젤로 &lt;죽어가는 노예&gt;, 카노바 &lt;큐피드의 키스로 되살아난 프시케&gt; → <strong>703실</strong>: &lt;사모트라케의 니케&gt;를 계단 아래 전체 모습에서 시작해 계단을 올라가며 날개와 몸의 움직임을 보고, 계단 중간에서 사진 촬영 후 정상에서 약간 왼쪽 3/4 방향으로 감상 → <strong>711실</strong>: 다빈치 &lt;모나리자&gt;, 베로네세 &lt;가나의 혼인잔치&gt; → <strong>700실</strong>: 제리코 &lt;메두사의 뗏목&gt;, 들라크루아 &lt;민중을 이끄는 자유의 여신&gt; → <strong>SULLY 0층 345실</strong>: &lt;밀로의 비너스&gt; → <strong>348실</strong>: &lt;잠자는 헤르마프로디토스&gt; → <strong>지하 338실</strong>: &lt;타니스의 스핑크스&gt; → <strong>1층 635실</strong>: &lt;앉아있는 서기&gt; 순으로 관람.", "map": "Louvre Museum", "buffer": "루브르 17:00 예약 / 관람 전 화장실 미리 이용"}, {"time": "20:30", "title": "저녁식사", "desc": "루브르 관람 후 저녁식사.", "map": "Louvre Museum Nearby", "buffer": null}]}, {"day": 12, "date": "10/29 (목)", "city": "파리", "country": "프랑스", "flag": "🇫🇷", "theme": "베르사유 & 바토 파리지엥", "schedules": [{"time": "08:00~09:00", "title": "RER C선 이동", "desc": "RER C선을 타고 베르사유로 이동.", "map": "Versailles Château Rive Gauche", "buffer": null}, {"time": "09:30~14:00", "title": "베르사유 궁전 & 정원", "desc": "09:30 예약. 궁전은 <strong>1층 중심으로 동선 낭비를 줄여</strong> 관람: 왕의 대아파트 <strong>헤라클레스의 방 → 풍요의 방 → 비너스의 방 → 다이아나의 방 → 마르스의 방 → 메르쿠리우스의 방 → 아폴론의 방</strong> → <strong>전쟁의 방 → 거울의 방(메인 포토 포인트) → 평화의 방</strong> 순으로 이동. 이후 <strong>왕비의 대아파트</strong> 쪽으로 이어져 왕비 침실 등 핵심 공간을 관람한 뒤 출구 방향으로 이동. 시간이 빠듯하면 개인 아파트·부속 전시실은 생략하고 <strong>왕의 대아파트 → 거울의 방 → 왕비의 대아파트</strong> 핵심 동선에 집중한 뒤 정원으로 나가는 것을 권장. 정원에서는 대운하 방향으로 이동.", "map": "Palace of Versailles", "buffer": "베르사유 궁전 09:30 예약"}, {"time": "14:00~15:30", "title": "점심식사", "desc": "베르사유 일정 후 점심식사.", "map": "Versailles Palace Nearby", "buffer": null}, {"time": "16:00~17:00", "title": "RER C선 → 바토 파리지엥 선착장", "desc": "RER C선으로 이동하여 에펠탑 바토 파리지엥 선착장(Port de la Bourdonnais)으로 이동.", "map": "Port de la Bourdonnais", "buffer": null}, {"time": "17:40~18:40", "title": "바토 파리지엥 Bateaux Parisiens 유람선", "desc": "센강 유람선 탑승.", "map": "Bateaux Parisiens", "buffer": "좋은 자리(2층 야외 좌석)를 원하면 최소 출발 20분 전에는 줄 설 것"}, {"time": "19:30~", "title": "저녁 식사", "desc": "유람선 후 저녁식사.", "map": "Eiffel Tower", "buffer": "강 바람이 매우 차므로 경량패딩 또는 두꺼운 외투 필수"}]}, {"day": 13, "date": "10/30 (금)", "city": "파리", "country": "프랑스", "flag": "🇫🇷", "theme": "오르세미술관 & 몽마르뜨", "schedules": [{"time": "09:30~12:30", "title": "오르세 미술관 — 0층 → 5층 → 2층", "desc": "09:30 예약. <strong>0층(지상층, 약 40분)</strong>: 사실주의 & 초기 인상주의 — 장프랑수아 밀레 Salle 4 &lt;이삭 줍는 사람들&gt;, &lt;만종&gt;; 귀스타브 쿠르베 Salle 7 &lt;화가의 화실&gt;, &lt;오르낭의 매장&gt;; 에두아르 마네 Salle 14 &lt;풀밭 위의 점심식사&gt;, &lt;올랭피크&gt;. 이어 <strong>5층(엘리베이터 이용, 29번 → 37번, 약 60분)</strong>: 마네 29번 &lt;풀밭 위의 점심식사&gt;, &lt;올랭피아&gt;, &lt;양산을 쓴 여인들&gt;; 모네 29번 &lt;양귀비&gt;, &lt;생 라자르 역&gt;, &lt;루앙 대성당&gt;; 드가 Salle 31~32 &lt;무용 수업&gt;, &lt;압생트&gt;; 르누아르 Salle 30, 32 &lt;물랭 드 라 갈레트의 무도회&gt;, &lt;무도회에서의 춤&gt;; 고흐 Salle 35~37 &lt;자화상&gt;, &lt;오베르의 교회&gt;, &lt;론강의 별이 빛나는 밤&gt;. 📸 포토타임 1: 5층 시계탑 창문(Salle 37 건너편). 이후 Café Campana(5층)에서 약 20분 휴식. 마지막으로 <strong>2층(약 30분)</strong>: 고갱 Salle 70 &lt;아레아레아(기쁨)&gt;, 타히티 연작; 세잔 Salle 59~61 &lt;카드놀이 하는 사람들&gt;, &lt;사과와 귤&gt;. 📸 포토타임 2: 2층 중앙 테라스 난간.", "map": "Musée d'Orsay", "buffer": "오르세 09:30 예약"}, {"time": "12:30~14:00", "title": "점심식사", "desc": "오르세미술관 관람 후 점심식사.", "map": "Musée d'Orsay Nearby", "buffer": null}, {"time": "14:00~15:00", "title": "오르세 → Abbesses 이동", "desc": "메트로 12호선으로 Abbesses역 하차.", "map": "Abbesses Station", "buffer": null}, {"time": "15:00~18:30", "title": "몽마르뜨 세부 산책 동선", "desc": "Abbesses역 → 사랑해 벽 → 푸니쿨라 → 사크레쾨르 대성당 → Place du Tertre(떼르트르 광장) → 라 메종 로즈 → Rue de l'Abreuvoir → Rue Girardon → 풍차 방앗간 Moulin de la Galette → 물랭루즈 → Blanche역 순으로 이동.", "map": "Sacré-Cœur", "buffer": "일몰 17:33. 사크레쾨르 대성당 계단 위쪽에서 약 17시 정도에 자리 잡기 / 소매치기 및 팔찌 강매 주의"}, {"time": "18:30~20:00", "title": "저녁식사", "desc": "몽마르뜨 일정 후 저녁식사.", "map": "Place du Tertre", "buffer": null}]}, {"day": 14, "date": "10/31 (토)", "city": "파리 → 귀국", "country": "프랑스", "flag": "🇫🇷", "theme": "오페라 가르니에 & BNF & 갤러리 라파예트", "schedules": [{"time": "09:00~09:30", "title": "체크아웃 후 호텔에 짐 보관", "desc": "체크아웃 후 호텔에 짐 보관.", "map": "Best Western Premier Capital Opera", "buffer": null}, {"time": "10:00~11:30", "title": "오페라 가르니에", "desc": "10시 예약으로 오페라 가르니에 관람.", "map": "Palais Garnier", "buffer": "오페라 가르니에 10시 예약"}, {"time": "11:30~12:30", "title": "갤러리 라파예트 오스만", "desc": "갤러리 라파예트 오스만 방문.", "map": "Galeries Lafayette Haussmann", "buffer": null}, {"time": "12:30~14:00", "title": "점심식사", "desc": "갤러리 라파예트 일정 후 점심식사.", "map": "Galeries Lafayette", "buffer": null}, {"time": "14:00~15:30", "title": "리슐리외 국립도서관(BNF) Salle Ovale", "desc": "BNF 리슐리외관 Salle Ovale(오발 열람실) 관람.", "map": "Bibliothèque nationale de France Richelieu", "buffer": "정문에 줄이 길면 건물을 돌아서 후문으로 입장"}, {"time": "16:00", "title": "짐 수령 → CDG 공항 이동", "desc": "호텔에서 짐을 수령한 뒤 택시로 Châtelet - Les Halles역 이동 후 RER B 선 EXPRESS로 샤를드골 공항(CDG) 이동.", "map": "Paris Charles de Gaulle Airport", "buffer": null}, {"time": "18:00", "title": "샤를드골 공항 도착 및 출국 수속", "desc": "CDG 공항 도착 후 출국 수속.", "map": "Paris Charles de Gaulle Airport", "buffer": null}, {"time": "21:00", "title": "파리 출발", "desc": "귀국편 항공 탑승.", "map": "Paris Charles de Gaulle Airport", "buffer": null}]}];
+
+        // Source-synchronized default checklist (2026-10-08)
+        // Based on the uploaded final itinerary and packing checklist.
+        // On first launch after this update, the baseline checklist/budget below is loaded.
+        const DATA_VERSION = '2026-10-08-source-sync-v2';
+
+        // Sample Default Checklist Data
+        const defaultChecklist = [{"id": 1, "category": "essential", "text": "여권 (유효기간 6개월 이상 필수 확인)", "checked": true}, {"id": 2, "category": "essential", "text": "여권 복사본 2장 & 여권용 증명사진 2매", "checked": true}, {"id": 3, "category": "essential", "text": "항공권 E-티켓 프린트 출력본 & PDF 저장", "checked": true}, {"id": 4, "category": "essential", "text": "호텔 예약 확약서 (로마, 피렌체, 바르셀로나, 파리)", "checked": true}, {"id": 5, "category": "essential", "text": "도시 간 고속열차(Italo) & 부엘링 항공권 e-티켓", "checked": true}, {"id": 6, "category": "essential", "text": "해외 결제 신용/체크카드 (Contactless 지원)", "checked": true}, {"id": 7, "category": "essential", "text": "유로 현금 환전 (소액권 위주)", "checked": false}, {"id": 8, "category": "electronics", "text": "유럽 멀티 어댑터 (C타입/돼지코)", "checked": false}, {"id": 9, "category": "electronics", "text": "고용량 보조배터리 (기내 소지)", "checked": false}, {"id": 10, "category": "electronics", "text": "유럽 eSIM 또는 유심칩", "checked": false}, {"id": 11, "category": "clothes", "text": "경량 패딩 / 방풍 바람막이 (야경/유람선 대비)", "checked": false}, {"id": 12, "category": "clothes", "text": "편안한 운동화/트래킹화", "checked": false}, {"id": 13, "category": "toiletries", "text": "상비약 (타이레놀, 소화제, 지사제, 밴드)", "checked": false}, {"id": 14, "category": "misc", "text": "소매치기 방지 스프링 고리 & 스마트폰 핑거랩", "checked": false}, {"id": 15, "category": "essential", "text": "여권", "checked": false}, {"id": 16, "category": "electronics", "text": "스마트폰", "checked": false}, {"id": 17, "category": "essential", "text": "신용/체크/트레블 카드", "checked": false}, {"id": 18, "category": "essential", "text": "현금", "checked": false}, {"id": 19, "category": "electronics", "text": "e-SIM/U-SIM", "checked": false}, {"id": 20, "category": "essential", "text": "각종 예약 프린터물", "checked": false}, {"id": 21, "category": "essential", "text": "여권사본", "checked": false}, {"id": 22, "category": "essential", "text": "실물 사진 여권용/나비고 데쿠베르트용 2*3", "checked": false}, {"id": 23, "category": "essential", "text": "증명사진 파일(나비고 데쿠베르트용)", "checked": false}, {"id": 24, "category": "clothes", "text": "옷(속옷/양말)", "checked": false}, {"id": 25, "category": "clothes", "text": "바람막이/두꺼운 옷", "checked": false}, {"id": 26, "category": "clothes", "text": "방한용품", "checked": false}, {"id": 27, "category": "clothes", "text": "모자", "checked": false}, {"id": 28, "category": "misc", "text": "캐리어/백팩/크로스백/여행용 장바구니", "checked": false}, {"id": 29, "category": "misc", "text": "RFID 차단 케이스/ 동전 지갑", "checked": false}, {"id": 30, "category": "electronics", "text": "보조배터리 3개", "checked": false}, {"id": 31, "category": "electronics", "text": "유럽형 충전어뎁터/ 멀티탭", "checked": false}, {"id": 32, "category": "electronics", "text": "충전기/릴 케이블 충전선", "checked": false}, {"id": 33, "category": "electronics", "text": "이어폰(무선/ 동그란잭용)", "checked": false}, {"id": 34, "category": "clothes", "text": "운동화", "checked": false}, {"id": 35, "category": "clothes", "text": "접이식 슬리퍼", "checked": false}, {"id": 36, "category": "misc", "text": "캐리어용 와이어 자물쇠", "checked": false}, {"id": 37, "category": "misc", "text": "방문 자물쇠", "checked": false}, {"id": 38, "category": "misc", "text": "핸드폰 스트랩", "checked": false}, {"id": 39, "category": "misc", "text": "안경/ 케이스/ 안경 닦이", "checked": false}, {"id": 40, "category": "misc", "text": "선글라스", "checked": false}, {"id": 41, "category": "toiletries", "text": "치솔/치약/치실/치간칫솔", "checked": false}, {"id": 42, "category": "toiletries", "text": "샤워타올/면도기", "checked": false}, {"id": 43, "category": "toiletries", "text": "샴푸/바디워시 /클렌징", "checked": false}, {"id": 44, "category": "toiletries", "text": "드라이기", "checked": false}, {"id": 45, "category": "toiletries", "text": "생리대 등 여성용품", "checked": false}, {"id": 46, "category": "toiletries", "text": "썬크림", "checked": false}, {"id": 47, "category": "toiletries", "text": "스킨/로션/기타", "checked": false}, {"id": 48, "category": "toiletries", "text": "면봉/손톱깎기/코털 가위", "checked": false}, {"id": 49, "category": "misc", "text": "접이용 과도(다이소)", "checked": false}, {"id": 50, "category": "misc", "text": "우산", "checked": false}, {"id": 51, "category": "toiletries", "text": "안대/귀마개/목베개/가습마스크", "checked": false}, {"id": 52, "category": "toiletries", "text": "상비약(소화제/지사제/해열진통제/감기약/멀미약)", "checked": false}, {"id": 53, "category": "toiletries", "text": "밴드/물집 패드", "checked": false}, {"id": 54, "category": "toiletries", "text": "인공눈물", "checked": false}, {"id": 55, "category": "toiletries", "text": "멜라토닌/ 피로회복제", "checked": false}, {"id": 56, "category": "toiletries", "text": "스타틴/비타민/영양제", "checked": false}, {"id": 57, "category": "toiletries", "text": "파스/휴족시간", "checked": false}, {"id": 58, "category": "toiletries", "text": "티슈/물티슈/ 마이비데", "checked": false}, {"id": 59, "category": "toiletries", "text": "1회용 페이스 타올/ 알콜 스왑", "checked": false}, {"id": 60, "category": "misc", "text": "컵라면/볶음김치/햇반", "checked": false}, {"id": 61, "category": "misc", "text": "1회용 수저", "checked": false}, {"id": 62, "category": "misc", "text": "비닐 지퍼백(잔여 음식물 보관 등)", "checked": false}, {"id": 63, "category": "misc", "text": "테이프", "checked": false}, {"id": 64, "category": "misc", "text": "파리 뮤지엄패스 2일권", "checked": false}, {"id": 65, "category": "misc", "text": "카탈루냐 음악당 공연 티켓", "checked": false}, {"id": 66, "category": "essential", "text": "노트르담 대성당 Cathédrale Notre-Dame de Paris 앱에서 예매(10.26. 10:00 오픈)", "checked": false}, {"id": 67, "category": "misc", "text": "바로셀로나 T-familia 구입", "checked": false}, {"id": 68, "category": "misc", "text": "나비고 데쿠베르트 IDF Mobilités 구입(10.23. 이후)", "checked": false}, {"id": 69, "category": "misc", "text": "앱 설치(feenow/volt/the fork)", "checked": false}, {"id": 70, "category": "misc", "text": "트레블카드설정(자동충전 X, 1회 결제 한도)", "checked": false}, {"id": 71, "category": "electronics", "text": "구글 번역 언어팩(이탈리아, 스페인, 프랑스) 다운로드", "checked": false}, {"id": 72, "category": "electronics", "text": "구글 내지도 다운로드", "checked": false}, {"id": 73, "category": "misc", "text": "공항 라운지 예약(출국 24시간 전)", "checked": false}, {"id": 74, "category": "misc", "text": "사그라다파밀리아 앱 가입 및 오디오가이드 다운로드", "checked": false}, {"id": 75, "category": "misc", "text": "베르사유궁전 앱 가입 및 오디오가이드 다운로드", "checked": false}, {"id": 76, "category": "misc", "text": "숙소 연락(도착시간 등)", "checked": false}, {"id": 77, "category": "misc", "text": "숙소 도시세(피렌체 80,559원/바셀 153,846원)", "checked": false}, {"id": 78, "category": "misc", "text": "성베드로 대성당 입장료 가이드 현금 지불(3명 21유로)", "checked": false}, {"id": 79, "category": "misc", "text": "투어 연락(바티칸/ 토스카나)", "checked": false}, {"id": 80, "category": "misc", "text": "여행자 보험 가입", "checked": false}, {"id": 81, "category": "misc", "text": "부엘링 항공(피렌체-바셀) 수하물 바우처 구입", "checked": false}, {"id": 82, "category": "misc", "text": "마이리얼트립 바토 파리지엥 구입(1인당 13,748원, 현지 18유로)", "checked": false}, {"id": 83, "category": "misc", "text": "서울-로마 온라인 체크인", "checked": false}, {"id": 84, "category": "misc", "text": "피렌체-바셀 온라인 체크인", "checked": false}, {"id": 85, "category": "misc", "text": "바셀-파리(EKJ17G) 온라인 체크인", "checked": false}, {"id": 86, "category": "misc", "text": "파리-서울 온라인 체크인", "checked": false}];
+
+        // Source-synchronized prepaid expenses (KRW amounts explicitly recorded in uploaded budget file)
+        // Non-KRW / not-yet-priced rows are intentionally not included in the current execution total.
+        const defaultPrepaidExpenses = [{"id": 1, "name": "인천-로마/파리-인천", "category": "항공", "desc": "-", "amount": 5516100}, {"id": 2, "name": "피렌체-바로셀로나", "category": "항공", "desc": "취소불가", "amount": 345745}, {"id": 3, "name": "피렌체-바로셀로나", "category": "항공", "desc": "-", "amount": 28400}, {"id": 4, "name": "바로셀로나-파리(부엘링항공 부킹코드 EKJI7G)", "category": "항공", "desc": "일부취소가능", "amount": 775250}, {"id": 5, "name": "로마 3박 Lexie Siutes", "category": "숙소", "desc": "10.14.까지 취소가능", "amount": 1162770}, {"id": 6, "name": "피렌체 3박 Marco's way", "category": "숙소", "desc": "10.13.까지 취소 가능", "amount": 973243}, {"id": 7, "name": "바로셀로나 3박 Rambla 102", "category": "숙소", "desc": "10.16.까지 취소 가능", "amount": 1253393}, {"id": 8, "name": "파리 4박 Mayflowers Paris Opera", "category": "숙소", "desc": "-", "amount": 1597394}, {"id": 9, "name": "기차 피렌체-베네치아", "category": "교통", "desc": "일부취소가능", "amount": 376341}, {"id": 10, "name": "토스카나(노마드트레블)", "category": "투어", "desc": "10.20.까지 취소가능", "amount": 525000}, {"id": 11, "name": "콜로세움/포로로마노/팔라티노 언덕(오디오가이드)", "category": "입장권", "desc": "30일 전 오픈", "amount": 85770}, {"id": 12, "name": "바티칸 투어(이태리시티 투어)", "category": "투어", "desc": "9.20.까지 취소 가능", "amount": 187000}, {"id": 13, "name": "바티칸 패스트 트랙 티켓", "category": "입장권", "desc": "취소불가", "amount": 165000}, {"id": 14, "name": "판테온(오디오 가이드)", "category": "입장권", "desc": "약 30일 전 오픈", "amount": 33800}, {"id": 15, "name": "산마르코 대성당", "category": "입장권", "desc": "-", "amount": 92336}, {"id": 16, "name": "사그라다파밀리아/with Tower on the Nativity facade", "category": "입장권", "desc": "-", "amount": 127930}, {"id": 17, "name": "구엘공원", "category": "입장권", "desc": "-", "amount": 85197}, {"id": 18, "name": "오페라 가르니에", "category": "입장권", "desc": "-", "amount": 115420}, {"id": 19, "name": "캐리어", "category": "준비물", "desc": "-", "amount": 134980}, {"id": 20, "name": "멀티탭", "category": "준비물", "desc": "-", "amount": 26400}, {"id": 21, "name": "쿠팡 10.5. (물집패드/전설의 패치)", "category": "준비물", "desc": "-", "amount": 24600}, {"id": 22, "name": "쿠팡 10.4. 캐리어 네임택", "category": "준비물", "desc": "-", "amount": 5460}, {"id": 23, "name": "휴대용 티슈", "category": "준비물", "desc": "-", "amount": 3100}, {"id": 24, "name": "휴대용 피크닉 매트", "category": "준비물", "desc": "-", "amount": 3270}, {"id": 25, "name": "양말 여성용 ", "category": "준비물", "desc": "-", "amount": 13800}, {"id": 26, "name": "가습마스크", "category": "준비물", "desc": "-", "amount": 9210}, {"id": 27, "name": "손목지압 멀미방지", "category": "준비물", "desc": "-", "amount": 8800}, {"id": 28, "name": "양말 남성용", "category": "준비물", "desc": "-", "amount": 9880}, {"id": 29, "name": "유럽형 돼지코", "category": "준비물", "desc": "-", "amount": 8600}, {"id": 30, "name": "휴족시간", "category": "준비물", "desc": "-", "amount": 19260}, {"id": 31, "name": "마이비데", "category": "준비물", "desc": "-", "amount": 6900}, {"id": 32, "name": "캐리어 잠금장치", "category": "준비물", "desc": "-", "amount": 7980}, {"id": 33, "name": "보조배터리", "category": "준비물", "desc": "-", "amount": 10900}, {"id": 34, "name": "여행용 세면도구 파우치", "category": "준비물", "desc": "-", "amount": 5620}, {"id": 35, "name": "파스", "category": "준비물", "desc": "-", "amount": 9340}, {"id": 36, "name": "이어폰", "category": "준비물", "desc": "-", "amount": 21900}, {"id": 37, "name": "충전기", "category": "준비물", "desc": "-", "amount": 33119}, {"id": 38, "name": "크로스백", "category": "준비물", "desc": "-", "amount": 22410}, {"id": 39, "name": "테무 기타", "category": "준비물", "desc": "-", "amount": 65298}, {"id": 40, "name": "다이소 기타", "category": "준비물", "desc": "-", "amount": 23000}, {"id": 41, "name": "퀵앤써 피로회복제", "category": "준비물", "desc": "-", "amount": 9000}, {"id": 42, "name": "멜라토닌", "category": "준비물", "desc": "-", "amount": 5000}, {"id": 43, "name": "반달크로스백 등 기타", "category": "준비물", "desc": "-", "amount": 8000}, {"id": 44, "name": "유심 & 이심", "category": "준비물", "desc": "-", "amount": 59100}, {"id": 45, "name": "우산", "category": "준비물", "desc": "-", "amount": 17928}, {"id": 46, "name": "목베개", "category": "준비물", "desc": "-", "amount": 15000}, {"id": 47, "name": "테무 백팩", "category": "준비물", "desc": "-", "amount": 10735}, {"id": 48, "name": "챗 gpt", "category": "기타", "desc": "-", "amount": 13000}];
+
+        // State Variables
+        let currentTab = 'info';
+        let currentDayFilter = 1;
+
+        const savedDataVersion = localStorage.getItem('euro2026_data_version');
+        const hasSourceSyncedBaseline = savedDataVersion === DATA_VERSION;
+
+        // The source-synchronized checklist and prepaid budget are refreshed once per data version.
+        // Existing onsite expenses are preserved because they may have been entered manually.
+        let checklist = hasSourceSyncedBaseline
+            ? (JSON.parse(localStorage.getItem('euro2026_checklist')) || defaultChecklist)
+            : [...defaultChecklist];
+
+        let prepaidExpenses = hasSourceSyncedBaseline
+            ? (JSON.parse(localStorage.getItem('euro2026_prepaid_expenses')) || defaultPrepaidExpenses)
+            : [...defaultPrepaidExpenses];
+
+        let onsiteExpenses = JSON.parse(localStorage.getItem('euro2026_onsite_expenses')) || [];
+        let fxRate = parseFloat(localStorage.getItem('euro2026_fxrate')) || 1480;
+
+        if (!hasSourceSyncedBaseline) {
+            localStorage.setItem('euro2026_checklist', JSON.stringify(checklist));
+            localStorage.setItem('euro2026_prepaid_expenses', JSON.stringify(prepaidExpenses));
+            localStorage.setItem('euro2026_data_version', DATA_VERSION);
+        }
+        let currentExpenseType = 'prepaid';
+
+        // Window Init
+        window.onload = function() {
+            updateLiveClocks();
+            setInterval(updateLiveClocks, 1000);
+
+            renderDayFilterButtons();
+            renderItinerary(currentDayFilter);
+            renderChecklist();
+
+            document.getElementById('fxRateInput').value = fxRate;
+            renderBudget();
+        };
+
+        // TTS Audio Pronunciation Function
+        function speakPhrase(text, lang, btnElement) {
+            if (!('speechSynthesis' in window)) {
+                showToast('❌ 이 브라우저는 음성 합성을 지원하지 않습니다.');
+                return;
+            }
+
+            window.speechSynthesis.cancel(); // Stop prior speech
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.85; // slightly slower for language learners
+            utterance.pitch = 1.0;
+
+            // Visual feedback
+            if (btnElement) {
+                const icon = btnElement.querySelector('i');
+                if (icon) {
+                    icon.className = 'fa-solid fa-volume-high text-amber-500 speaking-badge';
+                    setTimeout(() => {
+                        icon.className = icon.className.replace('text-amber-500 speaking-badge', '');
+                    }, 1800);
+                }
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Custom Toast Notification System (replaces alert)
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-900 text-white text-xs px-4 py-2.5 rounded-lg shadow-lg border border-slate-700 pointer-events-auto transition duration-300 opacity-0 transform translate-y-2';
+            toast.innerHTML = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Clock Update
+        function updateLiveClocks() {
+            const now = new Date();
+            const krOptions = { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const krTimeStr = new Intl.DateTimeFormat('ko-KR', krOptions).format(now);
+            
+            const euOptions = { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const euTimeStr = new Intl.DateTimeFormat('ko-KR', euOptions).format(now);
+
+            document.getElementById('koreaClock').innerText = `KST ${krTimeStr}`;
+            document.getElementById('europeClock').innerText = `CEST/CET ${euTimeStr}`;
+            document.getElementById('mobileClock').innerText = `현지 ${euTimeStr.substring(0,5)}`;
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
+
+            document.getElementById(`page-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function filterCountryInfo(country) {
+            const cards = document.querySelectorAll('.country-card');
+            cards.forEach(card => {
+                if (country === 'all' || card.classList.contains(country)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function renderDayFilterButtons() {
+            const container = document.getElementById('dayFilterButtons');
+            container.innerHTML = itineraryData.map(item => `
+                <button onclick="selectDayFilter(${item.day})" id="dayBtn-${item.day}" 
+                    class="day-btn text-xs font-semibold px-3 py-2 rounded-lg border flex flex-col items-center min-w-[70px] transition ${item.day === currentDayFilter ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                    <span>DAY ${item.day}</span>
+                    <span class="text-[10px] opacity-80">${item.date.split(' ')[0]}</span>
+                </button>
+            `).join('');
+        }
+
+        function selectDayFilter(day) {
+            currentDayFilter = day;
+            renderDayFilterButtons();
+            renderItinerary(day);
+        }
+
+        function renderItinerary(day) {
+            const container = document.getElementById('itineraryContainer');
+            const dayData = itineraryData.find(d => d.day === day);
+
+            if (!dayData) return;
+
+            container.innerHTML = `
+                <div class="bg-gradient-to-r from-indigo-900 via-slate-900 to-blue-900 text-white p-5 rounded-xl shadow-md">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 text-xs px-2.5 py-1 rounded-full font-bold">DAY ${dayData.day} · ${dayData.date}</span>
+                            <h2 class="text-2xl font-extrabold mt-2 flex items-center gap-2">
+                                <span>${dayData.flag}</span> ${dayData.city} (${dayData.country})
+                            </h2>
+                            <p class="text-sm text-indigo-200 mt-1 font-medium"><i class="fa-solid fa-compass mr-1"></i> ${dayData.theme}</p>
+                        </div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dayData.city)}" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg border border-white/20 transition flex items-center gap-1">
+                            <i class="fa-solid fa-map-location-dot text-amber-400"></i>
+                            <span class="hidden sm:inline">도시 지도 검색</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 space-y-6">
+                    <h3 class="font-bold text-slate-800 text-base border-b pb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-clock text-indigo-600 mr-2"></i> 타임라인 일정 상세</span>
+                    </h3>
+
+                    <div class="relative border-l-2 border-indigo-100 ml-3 sm:ml-4 space-y-6 pl-4 sm:pl-6">
+                        ${dayData.schedules.map((item) => `
+                            <div class="relative group">
+                                <div class="absolute -left-[23px] sm:-left-[31px] top-1 w-3.5 h-3.5 rounded-full bg-indigo-600 border-4 border-white shadow"></div>
+
+                                <div class="bg-slate-50 hover:bg-indigo-50/50 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 transition">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="bg-indigo-100 text-indigo-800 font-bold text-xs px-2.5 py-0.5 rounded-md font-mono">${item.time}</span>
+                                            <h4 class="font-bold text-slate-800 text-sm sm:text-base">${item.title}</h4>
+                                        </div>
+
+                                        ${item.map ? `
+                                            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map)}" target="_blank" 
+                                               class="inline-flex items-center space-x-1 text-xs bg-white text-blue-600 border border-blue-200 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded-md shadow-sm transition self-start sm:self-auto">
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <span>구글맵 검색</span>
+                                            </a>
+                                        ` : ''}
+                                    </div>
+
+                                    <div class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed space-y-1">${item.desc}</div>
+
+                                    ${item.buffer ? `
+                                        <div class="mt-2.5 inline-block bg-amber-50 text-amber-900 border border-amber-200 text-xs px-2.5 py-1 rounded-md font-medium">
+                                            <i class="fa-regular fa-clock text-amber-600 mr-1"></i> ${item.buffer}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Checklist Logic
+        function renderChecklist() {
+            const container = document.getElementById('checklistCategoriesContainer');
+            
+            const categoryTitles = {
+                essential: { title: "📄 필수 서류 & 금융", color: "border-blue-500" },
+                electronics: { title: "🔌 전자기기 & 스마트폰", color: "border-indigo-500" },
+                clothes: { title: "👕 의류 & 착용품", color: "border-emerald-500" },
+                toiletries: { title: "💊 위생용품 & 상비약", color: "border-amber-500" },
+                misc: { title: "🎒 기타 & 보안용품", color: "border-purple-500" }
+            };
+
+            const categories = ['essential', 'electronics', 'clothes', 'toiletries', 'misc'];
+
+            container.innerHTML = categories.map(cat => {
+                const items = checklist.filter(i => i.category === cat);
+                const info = categoryTitles[cat];
+
+                return `
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 border-t-4 ${info.color}">
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 flex justify-between items-center border-b pb-2">
+                            <span>${info.title}</span>
+                            <span class="text-xs text-slate-400 font-normal">${items.filter(i => i.checked).length}/${items.length} 완료</span>
+                        </h3>
+                        <div class="space-y-1.5">
+                            ${items.length === 0 ? '<div class="text-xs text-slate-400 py-2 text-center">이 카테고리에 등록된 항목이 없습니다.</div>' : ''}
+                            ${items.map(item => `
+                                <div class="flex items-center justify-between p-1.5 rounded hover:bg-slate-50 group transition">
+                                    <label class="flex items-start space-x-2.5 cursor-pointer flex-grow pr-2">
+                                        <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklistItem(${item.id})" class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                        <span class="text-xs sm:text-sm text-slate-700 ${item.checked ? 'line-through text-slate-400' : ''}">${item.text}</span>
+                                    </label>
+                                    <button onclick="deleteChecklistItem(${item.id})" class="text-slate-300 hover:text-rose-500 px-1 py-0.5 text-xs opacity-0 group-hover:opacity-100 transition" title="삭제">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateChecklistProgress();
+        }
+
+        function toggleChecklistItem(id) {
+            checklist = checklist.map(item => item.id === id ? { ...item, checked: !item.checked } : item);
+            saveChecklist();
+            renderChecklist();
+        }
+
+        function deleteChecklistItem(id) {
+            checklist = checklist.filter(item => item.id !== id);
+            saveChecklist();
+            renderChecklist();
+            showToast('🗑️ 항목이 삭제되었습니다.');
+        }
+
+        function addCustomChecklistItem() {
+            const input = document.getElementById('newChecklistItemInput');
+            const categorySelect = document.getElementById('newChecklistCategorySelect');
+            const text = input.value.trim();
+
+            if (!text) {
+                showToast('⚠️ 준비물 이름을 입력해주세요.');
+                return;
+            }
+
+            checklist.push({
+                id: Date.now(),
+                category: categorySelect.value,
+                text: text,
+                checked: false
+            });
+
+            saveChecklist();
+            input.value = '';
+            renderChecklist();
+            showToast('✅ 새 준비물이 추가되었습니다.');
+        }
+
+        function toggleChecklistImporter() {
+            const box = document.getElementById('checklistImporterBox');
+            box.classList.toggle('hidden');
+        }
+
+        function addBulkChecklist() {
+            const textarea = document.getElementById('bulkChecklistTextarea');
+            const cat = document.getElementById('bulkChecklistCategory').value;
+            const lines = textarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+            if (lines.length === 0) {
+                showToast('⚠️ 내용을 입력해주세요.');
+                return;
+            }
+
+            lines.forEach((line, idx) => {
+                checklist.push({
+                    id: Date.now() + idx,
+                    category: cat,
+                    text: line,
+                    checked: false
+                });
+            });
+
+            saveChecklist();
+            textarea.value = '';
+            toggleChecklistImporter();
+            renderChecklist();
+            showToast(`✅ ${lines.length}개의 준비물이 추가되었습니다.`);
+        }
+
+        function replaceChecklistWithBulk() {
+            const textarea = document.getElementById('bulkChecklistTextarea');
+            const cat = document.getElementById('bulkChecklistCategory').value;
+            const lines = textarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+            if (lines.length === 0) {
+                showToast('⚠️ 교체할 내용을 입력해주세요.');
+                return;
+            }
+
+            checklist = lines.map((line, idx) => ({
+                id: Date.now() + idx,
+                category: cat,
+                text: line,
+                checked: false
+            }));
+
+            saveChecklist();
+            textarea.value = '';
+            toggleChecklistImporter();
+            renderChecklist();
+            showToast(`✅ 작성하신 ${lines.length}개 항목으로 전체가 교체되었습니다.`);
+        }
+
+        function clearAllChecklist() {
+            checklist = [];
+            saveChecklist();
+            renderChecklist();
+            showToast('🗑️ 체크리스트가 초기화되었습니다.');
+        }
+
+        function resetChecklistToDefault() {
+            checklist = [...defaultChecklist];
+            saveChecklist();
+            renderChecklist();
+            showToast('🔄 업로드한 준비물 기준 체크리스트로 복원되었습니다.');
+        }
+
+        function saveChecklist() {
+            localStorage.setItem('euro2026_checklist', JSON.stringify(checklist));
+        }
+
+        function updateChecklistProgress() {
+            if (checklist.length === 0) {
+                document.getElementById('checklistProgressPercent').innerText = '0%';
+                return;
+            }
+            const completed = checklist.filter(i => i.checked).length;
+            const percent = Math.round((completed / checklist.length) * 100);
+            document.getElementById('checklistProgressPercent').innerText = `${percent}%`;
+        }
+
+        // Expense Type Toggle (Prepaid vs Onsite Form)
+        function setExpenseType(type) {
+            currentExpenseType = type;
+            const btnPrepaid = document.getElementById('typeBtnPrepaid');
+            const btnOnsite = document.getElementById('typeBtnOnsite');
+            const formPrepaid = document.getElementById('formPrepaid');
+            const formOnsite = document.getElementById('formOnsite');
+            const formTitleText = document.getElementById('formTitleText');
+
+            if (type === 'prepaid') {
+                btnPrepaid.className = 'px-2.5 py-1 rounded-md font-bold bg-blue-600 text-white';
+                btnOnsite.className = 'px-2.5 py-1 rounded-md font-bold bg-slate-200 text-slate-700 hover:bg-slate-300';
+                formPrepaid.classList.remove('hidden');
+                formOnsite.classList.add('hidden');
+                formTitleText.innerText = '사전 집행 항목 추가하기 (원화 ₩)';
+            } else {
+                btnOnsite.className = 'px-2.5 py-1 rounded-md font-bold bg-blue-600 text-white';
+                btnPrepaid.className = 'px-2.5 py-1 rounded-md font-bold bg-slate-200 text-slate-700 hover:bg-slate-300';
+                formOnsite.classList.remove('hidden');
+                formPrepaid.classList.add('hidden');
+                formTitleText.innerText = '현지 추가 지출 기록하기 (유로 €)';
+            }
+        }
+
+        function addPrepaidExpense() {
+            const name = document.getElementById('prepaidTitle').value.trim();
+            const category = document.getElementById('prepaidCategory').value;
+            const desc = document.getElementById('prepaidDesc').value.trim();
+            const amount = parseFloat(document.getElementById('prepaidAmount').value);
+
+            if (!name || isNaN(amount) || amount <= 0) {
+                showToast('⚠️ 항목명과 올바른 원화 금액을 입력해주세요.');
+                return;
+            }
+
+            prepaidExpenses.push({
+                id: Date.now(),
+                name,
+                category,
+                desc: desc || '-',
+                amount
+            });
+
+            localStorage.setItem('euro2026_prepaid_expenses', JSON.stringify(prepaidExpenses));
+            
+            document.getElementById('prepaidTitle').value = '';
+            document.getElementById('prepaidDesc').value = '';
+            document.getElementById('prepaidAmount').value = '';
+
+            renderBudget();
+            showToast('✅ 사전 집행 항목이 등록되었습니다.');
+        }
+
+        function deletePrepaidExpense(id) {
+            prepaidExpenses = prepaidExpenses.filter(item => item.id !== id);
+            localStorage.setItem('euro2026_prepaid_expenses', JSON.stringify(prepaidExpenses));
+            renderBudget();
+            showToast('🗑️ 사전 집행 항목이 삭제되었습니다.');
+        }
+
+        function clearAllPrepaid() {
+            prepaidExpenses = [];
+            localStorage.setItem('euro2026_prepaid_expenses', JSON.stringify(prepaidExpenses));
+            renderBudget();
+            showToast('🗑️ 모든 사전 집행 항목이 삭제되었습니다.');
+        }
+
+        function addOnsiteExpense() {
+            const date = document.getElementById('expenseDate').value || new Date().toISOString().substring(0,10);
+            const title = document.getElementById('expenseTitle').value.trim();
+            const category = document.getElementById('expenseCategory').value;
+            const amountEur = parseFloat(document.getElementById('expenseAmountEur').value);
+
+            if (!title || isNaN(amountEur) || amountEur <= 0) {
+                showToast('⚠️ 내역과 올바른 유로 금액을 입력해주세요.');
+                return;
+            }
+
+            onsiteExpenses.push({ id: Date.now(), date, title, category, amountEur });
+            localStorage.setItem('euro2026_onsite_expenses', JSON.stringify(onsiteExpenses));
+
+            document.getElementById('expenseTitle').value = '';
+            document.getElementById('expenseAmountEur').value = '';
+
+            renderBudget();
+            showToast('✅ 현지 지출이 추가되었습니다.');
+        }
+
+        function deleteOnsiteExpense(id) {
+            onsiteExpenses = onsiteExpenses.filter(item => item.id !== id);
+            localStorage.setItem('euro2026_onsite_expenses', JSON.stringify(onsiteExpenses));
+            renderBudget();
+            showToast('🗑️ 현지 지출 항목이 삭제되었습니다.');
+        }
+
+        function renderBudget() {
+            // Render Prepaid Table
+            const prepaidBody = document.getElementById('prepaidTableBody');
+            const noPrepaid = document.getElementById('noPrepaidExpenses');
+            let totalPrepaid = 0;
+
+            if (prepaidExpenses.length === 0) {
+                noPrepaid.classList.remove('hidden');
+                prepaidBody.innerHTML = '';
+            } else {
+                noPrepaid.classList.add('hidden');
+                prepaidBody.innerHTML = prepaidExpenses.map(item => {
+                    totalPrepaid += item.amount;
+                    return `
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="p-2.5 font-bold text-slate-800">${item.name}</td>
+                            <td class="p-2.5"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs">${item.category}</span></td>
+                            <td class="p-2.5 text-slate-500">${item.desc}</td>
+                            <td class="p-2.5 text-right font-bold text-slate-800">₩${item.amount.toLocaleString()}</td>
+                            <td class="p-2.5 text-center">
+                                <button onclick="deletePrepaidExpense(${item.id})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Render Onsite Table
+            const onsiteBody = document.getElementById('onsiteTableBody');
+            const noOnsite = document.getElementById('noOnsiteExpenses');
+            let totalOnsiteEur = 0;
+
+            if (onsiteExpenses.length === 0) {
+                noOnsite.classList.remove('hidden');
+                onsiteBody.innerHTML = '';
+            } else {
+                noOnsite.classList.add('hidden');
+                onsiteBody.innerHTML = onsiteExpenses.map(item => {
+                    totalOnsiteEur += item.amountEur;
+                    const krw = Math.round(item.amountEur * fxRate);
+                    return `
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="p-2.5 text-slate-500">${item.date}</td>
+                            <td class="p-2.5 font-bold text-slate-800">${item.title}</td>
+                            <td class="p-2.5"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs">${item.category}</span></td>
+                            <td class="p-2.5 text-right font-bold text-blue-600">€${item.amountEur.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td class="p-2.5 text-right font-bold text-slate-700">₩${krw.toLocaleString()}</td>
+                            <td class="p-2.5 text-center">
+                                <button onclick="deleteOnsiteExpense(${item.id})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            const totalOnsiteKRW = Math.round(totalOnsiteEur * fxRate);
+            const grandTotalKRW = totalPrepaid + totalOnsiteKRW;
+
+            document.getElementById('totalPrepaidDisplay').innerText = `₩${totalPrepaid.toLocaleString()}`;
+            document.getElementById('totalOnsiteDisplay').innerText = `€${totalOnsiteEur.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('totalOnsiteKRWDisplay').innerText = `약 ₩${totalOnsiteKRW.toLocaleString()}`;
+            document.getElementById('grandTotalDisplay').innerText = `₩${grandTotalKRW.toLocaleString()}`;
+        }
+
+        function updateFxRate(val) {
+            fxRate = parseFloat(val) || 1480;
+            localStorage.setItem('euro2026_fxrate', fxRate);
+            renderBudget();
+            showToast('💱 환율이 업데이트되었습니다.');
+        }
+
+        function convertEurToKrw(eurVal) {
+            const eur = parseFloat(eurVal) || 0;
+            const krw = Math.round(eur * fxRate);
+            document.getElementById('calcKrwResult').innerText = `약 ₩ ${krw.toLocaleString()}`;
+        }
+
+        function toggleExpenseView(view) {
+            const btnPrepaid = document.getElementById('btn-exp-prepaid');
+            const btnOnsite = document.getElementById('btn-exp-onsite');
+            const prepaidList = document.getElementById('prepaidExpensesList');
+            const onsiteList = document.getElementById('onsiteExpensesList');
+
+            if (view === 'prepaid') {
+                btnPrepaid.className = 'flex-1 py-3 px-4 font-bold text-sm text-center text-blue-600 border-b-2 border-blue-600';
+                btnOnsite.className = 'flex-1 py-3 px-4 font-bold text-sm text-center text-slate-500 hover:text-slate-800';
+                prepaidList.classList.remove('hidden');
+                onsiteList.classList.add('hidden');
+            } else {
+                btnOnsite.className = 'flex-1 py-3 px-4 font-bold text-sm text-center text-blue-600 border-b-2 border-blue-600';
+                btnPrepaid.className = 'flex-1 py-3 px-4 font-bold text-sm text-center text-slate-500 hover:text-slate-800';
+                onsiteList.classList.remove('hidden');
+                prepaidList.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
