@@ -795,15 +795,15 @@ function speakPhrase(text, lang, btnElement) {
             );
         }
 
-        // 그래도 없으면 해당 언어 계열의 음성을 우선 선택
-        if (!voice) {
-            const baseLang = targetLang.split('-')[0];
+        // 언어 코드가 일치하는 음성만 선택
+if (!voice) {
+    const baseLang = targetLang.split('-')[0];
 
-            voice = voices.find(v =>
-                v.lang &&
-                v.lang.toLowerCase().includes(baseLang)
-            );
-        }
+    voice = voices.find(v =>
+        v.lang &&
+        v.lang.toLowerCase().split('-')[0] === baseLang
+    );
+}
 
         if (voice) {
             utterance.voice = voice;
