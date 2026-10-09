@@ -767,97 +767,34 @@ function speakPhrase(text, lang, btnElement) {
         return;
     }
 
-    const synth = window.speechSynthesis;
-    synth.cancel();
+    window.speechSynthesis.cancel();
 
-    const speak = () => {
-        const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.85;
+    utterance.pitch = 1.0;
 
-        // 원하는 현지 언어
-        utterance.lang = lang;
+    if (btnElement) {
+        const icon = btnElement.querySelector('i');
 
-        // 휴대폰에 설치된 해당 언어 음성을 직접 선택
-        const voices = synth.getVoices();
+        if (icon) {
+            const originalClass = icon.className;
 
-        const targetLang = lang.toLowerCase();
+            icon.className =
+                'fa-solid fa-volume-high text-amber-500 speaking-badge';
 
-        let voice = voices.find(v =>
-            v.lang && v.lang.toLowerCase() === targetLang
-        );
+            utterance.onend = () => {
+                icon.className = originalClass;
+            };
 
-        // 지역 코드가 정확히 일치하지 않는 경우
-        if (!voice) {
-            const baseLang = targetLang.split('-')[0];
-
-            voice = voices.find(v =>
-                v.lang &&
-                v.lang.toLowerCase().startsWith(baseLang)
-            );
+            utterance.onerror = () => {
+                icon.className = originalClass;
+            };
         }
-
-        // 언어 코드가 일치하는 음성만 선택
-if (!voice) {
-    const baseLang = targetLang.split('-')[0];
-
-    voice = voices.find(v =>
-        v.lang &&
-        v.lang.toLowerCase().split('-')[0] === baseLang
-    );
-}
-
-        if (voice) {
-            utterance.voice = voice;
-            utterance.lang = voice.lang;
-        }
-
-        // 여행용 발음이므로 약간 천천히
-        utterance.rate = 0.82;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-
-        // 버튼 시각 효과
-        if (btnElement) {
-            const icon = btnElement.querySelector('i');
-
-            if (icon) {
-                const originalClass = icon.className;
-
-                icon.className =
-                    'fa-solid fa-volume-high text-amber-500 speaking-badge';
-
-                utterance.onend = () => {
-                    icon.className = originalClass;
-                };
-
-                utterance.onerror = () => {
-                    icon.className = originalClass;
-                };
-            }
-        }
-
-        synth.speak(utterance);
-    };
-
-    // Android Chrome에서는 음성 목록이 늦게 로드될 수 있음
-    const voices = synth.getVoices();
-
-    if (voices.length > 0) {
-        speak();
-    } else {
-        synth.onvoiceschanged = () => {
-            synth.onvoiceschanged = null;
-            speak();
-        };
-
-        // 일부 Android 환경의 fallback
-        setTimeout(() => {
-            if (!synth.speaking) {
-                speak();
-            }
-        }, 300);
     }
-}
 
+    window.speechSynthesis.speak(utterance);
+}
         // Custom Toast Notification System (replaces alert)
         function showToast(message) {
             const container = document.getElementById('toastContainer');
